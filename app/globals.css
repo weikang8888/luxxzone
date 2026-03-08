@@ -121,6 +121,14 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply overflow-x-hidden bg-background text-foreground;
   }
+}
+
+/* Testimonials Swiper - dark theme pagination */
+.testimonials-pagination .swiper-pagination-bullet {
+  @apply bg-zinc-600 opacity-60;
+}
+.testimonials-pagination .swiper-pagination-bullet-active {
+  @apply bg-zinc-50 opacity-100;
 }

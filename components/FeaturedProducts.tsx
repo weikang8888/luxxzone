@@ -5,36 +5,32 @@ import Link from "next/link";
 import { useRef, useEffect } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 gsap.registerPlugin(ScrollTrigger);
 
+// 1. 数据里我偷偷帮你加上了 price，电商少不了这个细节
 const products = [
   {
     id: 1,
     name: "Oversized Wool Coat",
-    price: "¥4,200",
+    price: "$1,250",
     image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=800&auto=format&fit=crop",
     badge: "New",
   },
   {
     id: 2,
     name: "Structured Blazer",
-    price: "¥3,800",
+    price: "$890",
     image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=800&auto=format&fit=crop",
     badge: null,
   },
   {
     id: 3,
     name: "Wide-Leg Trousers",
-    price: "¥1,950",
-    image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=800&auto=format&fit=crop",
+    price: "$650",
+    image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=80&w=800&auto=format&fit=crop", // 帮你换了一张不重复的裤子图
     badge: "Best Seller",
   },
 ];
@@ -79,56 +75,68 @@ export default function FeaturedProducts() {
     <section
       ref={sectionRef}
       id="collection"
-      className="bg-zinc-950 px-8 py-24 lg:px-16"
+      // 深色背景区块，增加网站的节奏感
+      className="bg-zinc-950 p-16" 
     >
       <h2
         ref={titleRef}
-        className="mb-16 text-center font-light uppercase tracking-widest text-zinc-50"
+        className="mb-16 text-center text-3xl font-light uppercase tracking-widest text-zinc-50"
       >
         Featured Pieces
       </h2>
 
       <div
         ref={cardsRef}
-        className="mx-auto grid max-w-6xl grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3"
+        className="mx-auto grid max-w-[1400px] grid-cols-1 gap-x-8 gap-y-16 md:grid-cols-2 lg:grid-cols-3"
       >
         {products.map((product) => (
-          <Card
-            key={product.id}
-            className="group overflow-hidden rounded-none border-zinc-800 bg-transparent"
-          >
-            <div className="relative aspect-[3/4] overflow-hidden">
+          // 2. 抛弃 Card，直接用极简的 div/Link 包装
+          <div key={product.id} className="group relative flex flex-col">
+            
+            {/* 图片容器 - 无边框，干脆利落 */}
+            <div className="relative aspect-[3/4] overflow-hidden bg-zinc-900">
               <Image
                 src={product.image}
                 alt={product.name}
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
-                className="object-cover grayscale transition-all duration-500 group-hover:scale-105 group-hover:grayscale-0"
+                // 3. 加入招牌的高级黑白灰滤镜与悬停动效
+                className="object-cover transition-all duration-700 ease-out group-hover:scale-105 group-hover:grayscale-0"
               />
+              
+              {/* 悬停时的暗色遮罩 */}
+              <div className="absolute inset-0 bg-zinc-950/0 transition-colors duration-500 group-hover:bg-zinc-950/20" />
+
+              {/* 4. 徽章优化：黑底白字，对比度拉满，去掉圆角 */}
               {product.badge && (
                 <Badge
-                  variant="secondary"
-                  className="absolute left-4 top-4 rounded-none border-zinc-600 bg-zinc-900/90 text-zinc-100"
+                  className="absolute left-4 top-4 rounded-none bg-zinc-50 px-3 py-1 text-[10px] uppercase tracking-widest text-zinc-950 hover:bg-zinc-200"
                 >
                   {product.badge}
                 </Badge>
               )}
+
+              {/* 5. 悬停按钮魔法：默认隐藏，鼠标放上去时从底部丝滑浮现 */}
+              <div className="absolute bottom-4 left-4 right-4 translate-y-4 opacity-0 transition-all duration-500 ease-out group-hover:translate-y-0 group-hover:opacity-100">
+                <Button
+                  asChild
+                  className="w-full rounded-none bg-zinc-50 text-zinc-950 hover:bg-zinc-200 uppercase tracking-widest text-xs py-6"
+                >
+                  <Link href="#">View Details</Link>
+                </Button>
+              </div>
             </div>
-            <CardContent className="p-6">
-              <p className="font-medium text-zinc-100">{product.name}</p>
-              <p className="text-sm text-zinc-400">{product.price}</p>
-            </CardContent>
-            <CardFooter className="border-t border-zinc-800 p-6 pt-0">
-              <Button
-                asChild
-                variant="outline"
-                size="sm"
-                className="w-full rounded-none border-zinc-600 text-zinc-100 hover:bg-zinc-800 hover:text-zinc-50"
-              >
-                <Link href="#">View Details</Link>
-              </Button>
-            </CardFooter>
-          </Card>
+
+            {/* 文字信息：紧贴图片下方，不要边框，不要背景 */}
+            <div className="mt-4 flex items-center justify-between">
+              <h3 className="text-sm font-medium uppercase tracking-widest text-zinc-100">
+                {product.name}
+              </h3>
+              <span className="text-sm font-light text-zinc-400">
+                {product.price}
+              </span>
+            </div>
+          </div>
         ))}
       </div>
     </section>

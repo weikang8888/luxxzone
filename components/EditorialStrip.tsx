@@ -36,7 +36,7 @@ export default function EditorialStrip() {
           alt="Editorial - Autumn Winter 2026"
           fill
           sizes="100vw"
-          className="object-cover grayscale"
+          className="object-cover"
         />
       </div>
       <div className="absolute inset-0 flex items-center justify-center bg-zinc-950/30">

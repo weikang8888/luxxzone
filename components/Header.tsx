@@ -95,7 +95,7 @@ export default function Header() {
             bg-white 给了它一个实心的白色背景（类似你截图里的白块）。*/}
         <Link
           href="/"
-          className="absolute left-1/2 top-0 z-10 flex h-24 w-28 -translate-x-1/2 items-center justify-center bg-white shadow-sm md:h-24 md:w-48"
+          className="absolute left-1/2 top-0 z-10 flex h-24 w-28 -translate-x-1/2 items-center justify-center md:h-20 md:w-48"
         >
           {/* Logo 图片实际容器，预留一点 padding */}
           <div className="relative h-full w-full p-2 md:p-4">
