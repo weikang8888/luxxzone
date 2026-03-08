@@ -119,7 +119,7 @@ export default function MenSection() {
               variant="ghost"
               className="mt-6 w-fit gap-2 rounded-none px-0 text-zinc-100 hover:bg-transparent hover:text-zinc-50"
             >
-              <Link href="#">
+              <Link href="/category/outerwear">
                 Shop Men&apos;s
                 <ArrowRight className="size-4" />
               </Link>
@@ -142,12 +142,11 @@ export default function MenSection() {
             {categories.map((category) => (
               <Link
                 key={category.id}
-                href="#"
-                // 确保这里有 group class，这样子元素才能响应悬停
+                href={`/category/${category.name.toLowerCase()}`}
                 className="group block overflow-hidden"
               >
                 {/* 图片容器 */}
-                <div className="relative aspect-[4/5] overflow-hidden bg-zinc-100">
+                <div className="relative aspect-4/5 overflow-hidden bg-zinc-100">
                   <Image
                     src={category.image}
                     alt={category.name}

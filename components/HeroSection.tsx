@@ -107,7 +107,7 @@ export default function HeroSection() {
           priority
         />
         {/* 可选：加一层极其轻微的黑色渐变遮罩，让左侧的白底和右侧的黑白图片融合得更高级 */}
-        <div className="absolute inset-0 bg-gradient-to-r from-zinc-950/10 to-transparent lg:from-zinc-950/20" />
+        <div className="absolute inset-0 bg-linear-to-r from-zinc-950/10 to-transparent lg:from-zinc-950/20" />
       </div>
     </section>
   );

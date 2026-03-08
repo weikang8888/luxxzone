@@ -139,7 +139,7 @@ export default function Testimonials() {
                 <div className="group flex flex-col items-center gap-12 border border-zinc-800/50 bg-zinc-900/30 p-8 transition-colors duration-500 hover:border-zinc-700 hover:bg-zinc-900 lg:flex-row lg:items-start lg:gap-16 lg:p-12">
                   
                   {/* 🌟 核心视觉区：完美契合手机比例 (9:16) 的 WhatsApp 截图 */}
-                  <div className="relative aspect-[9/16] w-full shrink-0 overflow-hidden bg-zinc-800 shadow-xl sm:w-[300px] lg:w-[300px]">
+                  <div className="relative aspect-9/16 w-full shrink-0 overflow-hidden bg-zinc-800 shadow-xl sm:w-[300px] lg:w-[300px]">
                     <Image
                       src={image}
                       alt={`WhatsApp Chat with ${name}`}
@@ -166,7 +166,7 @@ export default function Testimonials() {
                     
                     {/* 署名和购买细节 */}
                     <div className="flex items-center gap-6">
-                      <div className="h-[1px] w-12 bg-zinc-700" />
+                      <div className="h-px w-12 bg-zinc-700" />
                       <div>
                         <p className="text-sm font-bold uppercase tracking-widest text-zinc-50">
                           {name}

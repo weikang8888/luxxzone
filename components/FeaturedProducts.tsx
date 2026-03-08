@@ -94,7 +94,7 @@ export default function FeaturedProducts() {
           <div key={product.id} className="group relative flex flex-col">
             
             {/* 图片容器 - 无边框，干脆利落 */}
-            <div className="relative aspect-[3/4] overflow-hidden bg-zinc-900">
+            <div className="relative aspect-3/4 overflow-hidden bg-zinc-900">
               <Image
                 src={product.image}
                 alt={product.name}

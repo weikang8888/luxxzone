@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ArrowRight, ChevronRight } from "lucide-react";
 import { useRef, useEffect } from "react";
 import { gsap } from "gsap";
 
 const leftCategories = [
-  { label: "Clothing", href: "#", hasArrow: true },
+  { label: "Clothing", href: "/category/clothing", hasArrow: true },
   { label: "Footwear", href: "#", hasArrow: true },
   { label: "Bags", href: "#", hasArrow: true },
   { label: "Watches", href: "#", hasArrow: true },
@@ -28,6 +28,17 @@ const rightCategories = [
   { label: "Wishlist", href: "#", hasArrow: false },
 ];
 
+const clothingBrands = [
+  "Louis Vuitton", "Hermes", "Gucci", "Chanel", "Dior", "Prada", "Balenciaga", "Celine", "Fendi", "Saint Laurent", "Loewe", "Givenchy"
+];
+
+// 🌟 仅供 Footwear 内部使用的本地数据，不修改全局数据
+const footwearSubItems = [
+  { label: "Sneakers", brands: ["Shop All", "Alexander McQueen", "Balenciaga", "Bottega Veneta", "Gucci", "Louis Vuitton"] },
+  { label: "Sandals", brands: ["Shop All", "Hermes", "Prada", "Valentino"] },
+  { label: "Loafers", brands: ["Shop All", "Loro Piana", "Bottega Veneta", "Tod's"] },
+];
+
 export default function Header() {
   const headerRef = useRef<HTMLElement>(null);
 
@@ -35,8 +46,6 @@ export default function Header() {
     gsap.from(headerRef.current, {
       opacity: 0,
       y: -20,
-      duration: 0.8,
-      delay: 0.5,
       ease: "power3.out",
     });
   }, []);
@@ -44,70 +53,113 @@ export default function Header() {
   return (
     <header
       ref={headerRef}
-      // 保持 Header 的固定定位和背景模糊
-      className="fixed left-0 right-0 top-0 z-50 border-b border-zinc-200/50 bg-zinc-50/80 backdrop-blur-md"
+      className="fixed left-0 right-0 top-0 z-100 border-b border-zinc-200/50 bg-zinc-50/80 backdrop-blur-md"
     >
-      {/* 关键 1: nav 必须是 relative，这样里面的 absolute Logo 才能以它为基准定位 */}
-      <nav className="relative flex min-h-20 items-center justify-center gap-6 px-4 py-4 lg:gap-12 lg:px-8">
+      <nav className="relative mx-auto flex min-h-20 items-center justify-between px-16">
 
-        {/* Left Categories */}
-        <div className="grid grid-cols-4 gap-x-6 gap-y-1 text-right lg:gap-x-8">
+        {/* 1. 左侧 8 个分类 */}
+        <div className="grid flex-1 grid-cols-4">
           {leftCategories.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              className="inline-flex items-center justify-start gap-0.5 text-[10px] font-medium uppercase tracking-widest text-zinc-950 transition-opacity hover:opacity-60 lg:text-xs"
-            >
-              {item.label}
-              {item.hasArrow && (
-                <ChevronDown className="size-3 shrink-0 lg:size-3.5" />
+            <div key={item.label} className="group/nav h-full">
+              <Link
+                href={item.href}
+                className="inline-flex items-center gap-1 py-2 text-[10px] font-bold uppercase tracking-widest text-zinc-950 transition-opacity hover:opacity-60 lg:text-xs"
+              >
+                {item.label}
+                {item.hasArrow && (
+                  <ChevronDown className={`size-3 transition-transform duration-200 ${item.label === "Clothing" ? "group-hover/nav:rotate-180" : ""}`} />
+                )}
+              </Link>
+
+              {/* 🌟 Clothing Mega Menu - 保持你原来的结构 */}
+              {item.label === "Clothing" && (
+                <div className="invisible absolute left-0 top-10 w-full border-t border-zinc-100 bg-white group-hover/nav:visible z-10">
+                  <div className="mx-auto w-full flex gap-20 p-16">
+                    <div className="flex-1">
+                      <p className="mb-10 text-[10px] font-medium uppercase tracking-[0.4em] text-zinc-400">Featured Brands</p>
+                      <div className="grid grid-cols-3 gap-x-12 gap-y-6">
+                        {clothingBrands.map((brand) => (
+                          <Link key={brand} href="#" className="text-sm font-light tracking-widest text-zinc-600 transition-colors hover:text-zinc-950">
+                            {brand}
+                          </Link>
+                        ))}
+                      </div>
+                      <Link href="/category/clothing" className="mt-12 inline-flex items-center gap-4 border-b border-zinc-950 pb-1 text-xs font-bold uppercase tracking-widest text-zinc-950">
+                        View All Clothing <ArrowRight className="size-4" />
+                      </Link>
+                    </div>
+
+                    <div className="relative w-[450px]">
+                      <div className="relative aspect-4/5 w-full overflow-hidden shadow-2xl">
+                        <Image src="/test-detail-1.webp" alt="Seasonal" fill className="object-cover" />
+                        <div className="absolute inset-0 bg-black/10 transition-opacity group-hover/nav:opacity-0" />
+                      </div>
+                      <div className="absolute -bottom-8 -left-8 bg-zinc-950 p-8 text-white shadow-2xl">
+                        <p className="mb-2 text-[10px] uppercase tracking-[0.3em] text-zinc-400">The New Era</p>
+                        <h4 className="text-2xl font-bold uppercase tracking-tighter text-zinc-100">Spring Selection</h4>
+                        <p className="mt-4 text-xs font-light tracking-widest text-zinc-300">Redefining the modern silhouette.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               )}
-            </Link>
+
+              {/* 🌟 Footwear Category Menu - 按照你的截图风格加入，瞬发无过渡 */}
+              {item.label === "Footwear" && (
+                <div className="invisible absolute top-10 min-w-[280px] border border-zinc-100 bg-white group-hover/nav:visible z-20 shadow-2xl">
+                  <div className="flex flex-col py-2">
+                    {footwearSubItems.map((sub) => (
+                      <div key={sub.label} className="group/sub relative">
+                        {/* 一级菜单项 */}
+                        <div className="flex items-center justify-between px-8 py-4 cursor-pointer hover:bg-zinc-50">
+                          <span className="text-[12px] font-medium tracking-widest text-zinc-900 uppercase">{sub.label}</span>
+                          <ChevronRight className="size-4 text-zinc-400" />
+                        </div>
+                        
+                        {/* 二级侧向弹出菜单 */}
+                        <div className="invisible absolute left-full -top-2 min-w-[280px] border border-zinc-100 bg-white group-hover/sub:visible shadow-2xl">
+                          <div className="flex flex-col py-2">
+                            {sub.brands.map((brand) => (
+                              <Link 
+                                key={brand} 
+                                href="#" 
+                                className={`px-8 py-3 text-[11px] tracking-[0.2em] transition-colors hover:bg-zinc-50 ${brand === 'Shop All' ? 'font-bold text-zinc-950 border-b border-zinc-50 mb-1' : 'font-light text-zinc-500 hover:text-zinc-950'}`}
+                              >
+                                {brand.toUpperCase()}
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            </div>
           ))}
         </div>
 
-        {/* 关键 2: 透明占位符 (Spacer) 
-            因为 Logo 变成了 absolute，我们需要这个空的 div 撑开左右菜单的距离。
-            宽度要和你的 Logo 容器差不多大。 */}
-        <div className="w-24 shrink-0 md:w-32"></div>
+        {/* 2. Logo - 保持你原来的绝对居中布局 */}
+        <Link href="/" className="flex h-20 w-48 items-center justify-center shrink-0">
+          <div className="relative h-full w-full p-4">
+            <Image src="/logo.png" alt="Luxxzone" fill className="object-contain" priority />
+          </div>
+        </Link>
 
-        {/* Right Categories */}
-        <div className="grid grid-cols-4 gap-x-6 gap-y-1 text-left lg:gap-x-8">
+        {/* 3. 右侧 8 个分类 */}
+        <div className="grid flex-1 grid-cols-4 gap-x-6 gap-y-1 text-right">
           {rightCategories.map((item) => (
             <Link
               key={item.label}
               href={item.href}
-              className="inline-flex items-center justify-end gap-0.5 text-[10px] font-medium uppercase tracking-widest text-zinc-950 transition-opacity hover:opacity-60 lg:text-xs"
+              className="inline-flex items-center justify-end gap-1 py-2 text-[10px] font-bold uppercase tracking-widest text-zinc-950 transition-opacity hover:opacity-60 lg:text-xs"
             >
-              {item.hasArrow && (
-                <ChevronDown className="size-3 shrink-0 lg:size-3.5" />
-              )}
+              {item.hasArrow && <ChevronDown className="size-3" />}
               {item.label}
-
             </Link>
           ))}
         </div>
-
-        {/* 关键 3: 绝对定位的 Logo 容器 
-            left-1/2 -translate-x-1/2 保证它绝对居中。
-            top-0 让它贴着顶部。
-            h-28 让它的高度超出了 nav 的 min-h-20，实现“凸出去”的效果。
-            bg-white 给了它一个实心的白色背景（类似你截图里的白块）。*/}
-        <Link
-          href="/"
-          className="absolute left-1/2 top-0 z-10 flex h-24 w-28 -translate-x-1/2 items-center justify-center md:h-20 md:w-48"
-        >
-          {/* Logo 图片实际容器，预留一点 padding */}
-          <div className="relative h-full w-full p-2 md:p-4">
-            <Image
-              src="/logo.png"
-              alt="Luxxzone"
-              fill
-              className="object-contain object-center"
-              priority
-            />
-          </div>
-        </Link>
 
       </nav>
     </header>

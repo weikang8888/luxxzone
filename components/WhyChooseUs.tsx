@@ -138,7 +138,7 @@ export default function WhyChooseUs() {
                   className="object-cover transition-all duration-700 ease-out group-hover:scale-105 group-hover:grayscale-0"
                 />
                 {/* 渐变遮罩：默认较深以突出底部标题，悬停时变得更深以便于阅读长段描述文字 */}
-                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/90 via-zinc-950/20 to-transparent transition-opacity duration-500 group-hover:from-zinc-950/95 group-hover:via-zinc-950/60" />
+                <div className="absolute inset-0 bg-linear-to-t from-zinc-950/90 via-zinc-950/20 to-transparent transition-opacity duration-500 group-hover:from-zinc-950/95 group-hover:via-zinc-950/60" />
               </div>
 
               {/* 内容交互层 */}

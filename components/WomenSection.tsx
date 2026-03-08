@@ -93,7 +93,7 @@ export default function WomenSection() {
           sizes="100vw"
           className="object-cover object-center" // 建议加上 grayscale 更契合你全站的高级黑白风
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-zinc-950/60 via-zinc-950/20 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-r from-zinc-950/60 via-zinc-950/20 to-transparent" />
         <div className="absolute inset-0 flex items-center p-8 lg:p-16">
           <div>
             <span className="mb-3 block font-light uppercase tracking-[0.4em] text-zinc-300">
@@ -109,7 +109,7 @@ export default function WomenSection() {
               asChild
               className="mt-8 rounded-none border border-zinc-50 bg-transparent px-8 py-6 font-light uppercase tracking-widest text-zinc-50 transition-colors duration-500 hover:bg-zinc-50 hover:text-zinc-950"
             >
-              <Link href="#" className="flex items-center gap-2">
+              <Link href="/category/dresses" className="flex items-center gap-2">
                 Explore Collection
                 <ArrowRight className="size-4" />
               </Link>
@@ -133,7 +133,7 @@ export default function WomenSection() {
           {categories.map((category) => (
             <Link
               key={category.id}
-              href="#"
+              href={`/category/${category.name.toLowerCase()}`}
               // 注入我们在数据中定义好的 gridClass
               className={`group flex flex-col ${category.gridClass}`}
             >
