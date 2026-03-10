@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 export default function HeroSection() {
   const labelRef = useRef<HTMLSpanElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
+  const subtitleRef = useRef<HTMLParagraphElement>(null);
   const btnRef = useRef<HTMLDivElement>(null);
   // 我们要把 ref 绑在内部的图片或者图片的父容器上，以实现“框不动，画在动”的高级效果
   const imageWrapperRef = useRef<HTMLDivElement>(null); 
@@ -22,16 +23,24 @@ export default function HeroSection() {
         y: 20,
         duration: 1.2,
         ease: "power3.out",
-        delay: 0.2,
+        delay: 1.5,
       });
 
       // 2. 主标题使用极其丝滑的 power4.out 缓动，营造“降临”感
       gsap.from(headlineRef.current, {
         opacity: 0,
-        y: 50,
+        y: 20,
         duration: 1.5,
         ease: "power4.out",
-        delay: 0.4,
+        delay: 1.5,
+      });
+
+      gsap.from(subtitleRef.current, {
+        opacity: 0,
+        y: 20,
+        duration: 1.2,
+        ease: "power3.out",
+        delay: 1.5,
       });
 
       gsap.from(btnRef.current, {
@@ -39,7 +48,7 @@ export default function HeroSection() {
         y: 20,
         duration: 1.2,
         ease: "power3.out",
-        delay: 0.8,
+        delay: 1.5,
       });
 
       // 3. 核心大图动画：外框从纯黑渐渐变透明（揭幕效果），内部图片极其缓慢地缩小（呼吸感）
@@ -47,7 +56,7 @@ export default function HeroSection() {
         opacity: 0,
         duration: 1.5,
         ease: "power2.out",
-        delay: 0.1,
+        delay: 1.5,
       });
 
       gsap.from(imageRef.current, {
@@ -75,10 +84,16 @@ export default function HeroSection() {
         {/* 主标题：加入了 tracking-tighter (字母变紧凑)，在超大字号下极具视觉冲击力 */}
         <h1
           ref={headlineRef}
-          className="mb-12 max-w-2xl text-5xl font-bold leading-[1.05] tracking-tighter text-zinc-950 md:text-6xl lg:text-7xl xl:text-8xl"
+          className="mb-4 max-w-2xl text-5xl font-bold leading-[1.05] tracking-tighter text-zinc-950 md:text-6xl lg:text-7xl xl:text-8xl"
         >
           REDEFINE THE SILHOUETTE
         </h1>
+        <p
+          ref={subtitleRef}
+          className="mb-12 text-lg font-light tracking-widest text-zinc-500 md:text-xl"
+        >
+          Luxury Fashion for Modern Style
+        </p>
 
         <div ref={btnRef}>
           <Button
