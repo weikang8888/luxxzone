@@ -44,7 +44,7 @@ export default function LoadingScreen2() {
     >
       <div
         ref={logoRef}
-        className="relative h-32 w-64 opacity-100 sm:h-40 sm:w-80 md:h-96 md:w-[55rem] shrink-0"
+        className="relative h-32 w-64 opacity-100 sm:h-40 sm:w-80 md:h-96 md:w-220 shrink-0"
       >
         <Image
           src="/logo.png"

@@ -70,7 +70,7 @@ export default function LoadingScreen() {
     >
       <div
         ref={logoRef}
-        className="relative h-32 w-64 sm:h-40 sm:w-80 md:h-48 md:w-96 [transform:translateZ(0)]"
+        className="relative h-32 w-64 sm:h-40 sm:w-80 md:h-48 md:w-96 transform-[translateZ(0)]"
         style={{ transform: "scale(3) translateZ(0)" }}
       >
         <Image
