@@ -4,47 +4,38 @@ import Image from "next/image";
 import { useRef, useEffect } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Gem, Leaf, Sparkles, Shield } from "lucide-react";
+import { Shield, CreditCard, Truck, Headphones } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// 数据：保留了精简高级的单字小标题，更容易排版
 const pillars = [
   {
-    icon: Gem,
-    label: "Craftsmanship",
-    description:
-      "Meticulously crafted by master artisans, ensuring unparalleled quality and absolute attention to detail.",
-    image:
-      "https://images.unsplash.com/photo-1558171813-4c088753af8f?q=80&w=800&auto=format&fit=crop",
-    alt: "Artisan craftsmanship",
-  },
-  {
-    icon: Sparkles,
-    label: "Exclusivity",
-    description:
-      "Limited-edition silhouettes that define the season. Own something truly unique, made for the discerning few.",
-    image:
-      "https://images.unsplash.com/photo-1496747611176-843222e1e57c?q=80&w=800&auto=format&fit=crop",
-    alt: "Exclusive runway collection",
-  },
-  {
-    icon: Leaf,
-    label: "Sustainability",
-    description:
-      "Responsible sourcing and ethical production. True luxury honors both the wearer and the planet.",
-    image:
-      "https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=800&auto=format&fit=crop",
-    alt: "Sustainable materials",
-  },
-  {
     icon: Shield,
-    label: "Concierge",
-    description:
-      "Dedicated service from first inquiry to care beyond purchase. Elevating your personal style journey.",
-    image:
-      "https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=800&auto=format&fit=crop",
-    alt: "Personal concierge experience",
+    label: "Authentic Products",
+    description: "Every item is verified for authenticity. Shop with confidence knowing you're getting genuine luxury.",
+    image: "https://images.unsplash.com/photo-1558171813-4c088753af8f?q=80&w=800&auto=format&fit=crop",
+    alt: "Authentic luxury products",
+  },
+  {
+    icon: CreditCard,
+    label: "Secure Payment",
+    description: "Your transactions are protected with industry-leading encryption. Safe and secure checkout every time.",
+    image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=800&auto=format&fit=crop",
+    alt: "Secure payment processing",
+  },
+  {
+    icon: Truck,
+    label: "Worldwide Shipping",
+    description: "We deliver to over 150 countries. Fast, reliable shipping with full tracking and insurance.",
+    image: "https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?q=80&w=800&auto=format&fit=crop",
+    alt: "Worldwide delivery",
+  },
+  {
+    icon: Headphones,
+    label: "Customer Support",
+    description: "Our dedicated team is here 24/7 to assist you. Premium service from inquiry to aftercare.",
+    image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=800&auto=format&fit=crop",
+    alt: "Dedicated customer support",
   },
 ];
 
@@ -128,7 +119,6 @@ export default function WhyChooseUs() {
               // 强制高度，打造修长的“巨石阵”画廊感
               className="group relative h-[450px] overflow-hidden bg-zinc-950 md:h-[500px] lg:h-[600px]"
             >
-              {/* 图片层：默认黑白，悬停时恢复色彩并缓慢放大 */}
               <div className="absolute inset-0">
                 <Image
                   src={image}
@@ -137,7 +127,6 @@ export default function WhyChooseUs() {
                   sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   className="object-cover transition-all duration-700 ease-out group-hover:scale-105 group-hover:grayscale-0"
                 />
-                {/* 渐变遮罩：默认较深以突出底部标题，悬停时变得更深以便于阅读长段描述文字 */}
                 <div className="absolute inset-0 bg-linear-to-t from-zinc-950/90 via-zinc-950/20 to-transparent transition-opacity duration-500 group-hover:from-zinc-950/95 group-hover:via-zinc-950/60" />
               </div>
 

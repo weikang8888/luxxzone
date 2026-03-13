@@ -2,6 +2,9 @@
 
 import Image from "next/image";
 import { useRef, useEffect } from "react";
+import feedbackImg from "@/public/feedback.png";
+import feedbackImg2 from "@/public/feedback-2.jpg";
+import feedbackImg3 from "@/public/feedback-3.jpg";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -14,26 +17,24 @@ import "swiper/css/effect-fade";
 
 gsap.registerPlugin(ScrollTrigger);
 
+const feedbackImages = [feedbackImg, feedbackImg2, feedbackImg3];
+
 // 🌟 数据：把你真实的 WhatsApp 截图路径填在 image 里
 const testimonials = [
   {
     quote: "The craftsmanship is extraordinary. Every stitch speaks of quality. This is what luxury should feel like.",
     name: "Elena Chen",
     detail: "Oversized Wool Coat",
-    // 替换为你的真实 WhatsApp 截图 (例如: "/images/whatsapp-chat-1.png")
-    image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=800&auto=format&fit=crop", 
   },
   {
     quote: "From the packaging to the fit, everything exceeded my expectations. Luxxzone has earned a lifelong customer.",
     name: "Marcus Laurent",
     detail: "Structured Blazer",
-    image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=800&auto=format&fit=crop",
   },
   {
     quote: "Finally, a brand that understands sustainable luxury. Beautiful pieces that don't compromise on ethics.",
     name: "Sofia Nakamura",
     detail: "Wide-Leg Trousers",
-    image: "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?q=80&w=800&auto=format&fit=crop",
   },
 ];
 
@@ -133,7 +134,7 @@ export default function Testimonials() {
             }}
             className="h-full"
           >
-            {testimonials.map(({ quote, name, detail, image }) => (
+            {testimonials.map(({ quote, name, detail }, index) => (
               <SwiperSlide key={name}>
                 {/* 内部采用左右排版的卡片：左手机截图 + 右大段文字 */}
                 <div className="group flex flex-col items-center gap-12 border border-zinc-800/50 bg-zinc-900/30 p-8 transition-colors duration-500 hover:border-zinc-700 hover:bg-zinc-900 lg:flex-row lg:items-start lg:gap-16 lg:p-12">
@@ -141,8 +142,8 @@ export default function Testimonials() {
                   {/* 🌟 核心视觉区：完美契合手机比例 (9:16) 的 WhatsApp 截图 */}
                   <div className="relative aspect-9/16 w-full shrink-0 overflow-hidden bg-zinc-800 shadow-xl sm:w-[300px] lg:w-[300px]">
                     <Image
-                      src={image}
-                      alt={`WhatsApp Chat with ${name}`}
+                      src={feedbackImages[index]}
+                      alt={`Feedback from ${name}`}
                       fill
                       sizes="(max-width: 640px) 100vw, 300px"
                       // object-top 保证超长聊天记录从第一句话开始显示；grayscale 提供黑白高级滤镜
