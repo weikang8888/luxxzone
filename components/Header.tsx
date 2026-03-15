@@ -6,6 +6,8 @@ import { Menu, X, Search } from "lucide-react";
 import { useRef, useEffect, useState } from "react";
 import { gsap } from "gsap";
 
+const WHATSAPP_NUMBER = "6581234567";
+
 // --- 导航数据 ---
 const leftCategories = [
   { label: "New Arrivals", href: "/category/new-arrivals" },
@@ -39,6 +41,17 @@ export default function Header() {
     });
   }, []);
 
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileMenuOpen]);
+
   return (
     <header
       ref={headerRef}
@@ -71,7 +84,7 @@ export default function Header() {
         </div>
 
         {/* ================= 3. Logo (居中) ================= */}
-        <Link href="/" className="flex h-12 w-32 items-center justify-center shrink-0 lg:h-20 lg:w-48">
+        <Link href="/" className="flex h-16 w-40 items-center justify-center shrink-0 lg:h-20 lg:w-48">
           <div className="relative h-full w-full p-2 lg:p-4">
             <Image src="/logo.png" alt="Luxxzone" fill className="object-contain" priority />
           </div>
@@ -103,16 +116,18 @@ export default function Header() {
       {/* ========================================================
            🌟 移动端全屏抽屉菜单 (Mobile Drawer)
            ======================================================== */}
-      <div className={`fixed inset-0 z-120 transition-transform duration-500 ease-out lg:hidden ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`}>
-        <div className="flex flex-col bg-white">
+      <div className={`fixed inset-0 z-120 flex flex-col transition-transform duration-500 ease-out lg:hidden ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`}>
+        <div className="flex min-h-dvh flex-col bg-white">
           {/* Drawer Header */}
-          <div className="flex items-center justify-between px-6 py-5 border-black border-b-2">
-            <span className="text-xs font-bold uppercase tracking-[0.2em]">Menu</span>
+          <div className="flex shrink-0 items-center justify-between px-6 py-5 border-black border-b-2">
+            <Link href="/" className="relative h-6 w-28" onClick={() => setIsMobileMenuOpen(false)}>
+              <Image src="/logo-horizontal.png" alt="Luxxzone" fill className="object-contain object-left" />
+            </Link>
             <button onClick={() => setIsMobileMenuOpen(false)} className="p-2"><X className="size-6" /></button>
           </div>
 
           {/* Men / Women 切换 */}
-          <div className="flex border-b border-zinc-100">
+          <div className="flex shrink-0 border-b border-zinc-100">
             {(["Men", "Women"] as const).map((tab) => (
               <button
                 key={tab}
@@ -124,8 +139,8 @@ export default function Header() {
             ))}
           </div>
 
-          {/* 菜单列表 */}
-          <div className="px-6 py-4 bg-white overflow-y-auto">
+          {/* 菜单列表 - flex-1 占满剩余高度并可滚动 */}
+          <div className="min-h-0 flex-1 overflow-y-auto bg-white px-6 py-4">
             <div className="space-y-6">
               {(activeTab === "Men" ? leftCategories : rightCategories).map((item) => (
                 <Link
@@ -141,20 +156,24 @@ export default function Header() {
 
             {/* About & Contact - 底部链接 */}
             <div className="mt-10 pt-8 border-t border-zinc-100 space-y-5">
-              <Link
-                href="/about"
+              <a
+                href="https://t.me/luxxzone"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="block text-sm font-bold uppercase tracking-tighter text-zinc-950"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 About
-              </Link>
-              <Link
-                href="/contact"
+              </a>
+              <a
+                href={`https://wa.me/${WHATSAPP_NUMBER}`}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="block text-sm font-bold uppercase tracking-tighter text-zinc-950"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Contact
-              </Link>
+              </a>
             </div>
 
             {/* Connect with us & Social Links */}
