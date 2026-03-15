@@ -70,27 +70,27 @@ export default function HeroSection() {
   }, []);
 
   return (
-    <section className="grid min-h-screen grid-cols-1 lg:grid-cols-2">
-      {/* Left Column - Typography & CTA */}
-      <div className="flex flex-col justify-center bg-zinc-50 px-8 py-16 lg:px-16 lg:py-24">
+    <section className="grid min-h-screen grid-cols-1 lg:grid-cols-2 pt-20">
+      {/* Left Column - Typography & CTA (order-2 on mobile = below image, lg:order-1 = first on desktop) */}
+      <div className="order-2 flex flex-col justify-center bg-zinc-50 px-6 py-8 lg:order-1 lg:px-16 lg:py-24">
         {/* 小标签增加 inline-block 确保动画位移准确 */}
         <span
           ref={labelRef}
-          className="mb-6 inline-block font-medium uppercase tracking-[0.3em] text-zinc-500"
+          className="mb-4 inline-block text-[10px] font-medium uppercase tracking-[0.2em] text-zinc-500 sm:mb-5 sm:text-xs sm:tracking-[0.25em] lg:mb-6 lg:text-sm lg:tracking-[0.3em]"
         >
           Spring/Summer 2026
         </span>
 
-        {/* 主标题：加入了 tracking-tighter (字母变紧凑)，在超大字号下极具视觉冲击力 */}
+        {/* 主标题：mobile 小字，桌面再放大 */}
         <h1
           ref={headlineRef}
-          className="mb-4 max-w-2xl text-5xl font-bold leading-[1.05] tracking-tighter text-zinc-950 md:text-6xl lg:text-7xl xl:text-8xl"
+          className="mb-3 max-w-2xl text-3xl font-bold leading-[1.05] tracking-tighter text-zinc-950 sm:text-4xl md:mb-4 md:text-5xl md:text-6xl lg:text-7xl xl:text-8xl"
         >
           REDEFINE THE SILHOUETTE
         </h1>
         <p
           ref={subtitleRef}
-          className="mb-12 text-lg font-light tracking-widest text-zinc-500 md:text-xl"
+          className="mb-8 text-sm font-light tracking-widest text-zinc-500 sm:text-base md:mb-12 lg:text-lg xl:text-xl"
         >
           Luxury Fashion for Modern Style
         </p>
@@ -99,17 +99,17 @@ export default function HeroSection() {
           <Button
             asChild
             variant="outline"
-            className="w-fit rounded-none border-zinc-950 px-8 py-6 font-medium uppercase tracking-widest text-zinc-950 transition-all duration-500 hover:bg-zinc-950 hover:text-zinc-50"
+            className="w-fit rounded-none border-zinc-950 px-5 py-4 text-xs font-medium uppercase tracking-widest text-zinc-950 transition-all duration-500 hover:bg-zinc-950 hover:text-zinc-50 sm:px-6 sm:py-5 sm:text-sm lg:px-8 lg:py-6"
           >
             <Link href="#collection">Discover Collection</Link>
           </Button>
         </div>
       </div>
 
-      {/* Right Column - Fashion Image */}
+      {/* Right Column - Fashion Image (mobile 较矮，桌面全屏) */}
       <div 
         ref={imageWrapperRef} 
-        className="relative h-[50vh] overflow-hidden bg-zinc-950 lg:h-screen"
+        className="order-1 relative h-[50vh] overflow-hidden bg-zinc-950 lg:order-2 lg:h-screen"
       >
         <Image
           ref={imageRef} // 将动画绑在图片本身上

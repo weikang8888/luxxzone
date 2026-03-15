@@ -1,12 +1,16 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Swiper, SwiperSlide } from "swiper/react";
 import { Shield, CreditCard, Truck, Headphones } from "lucide-react";
+import "swiper/css";
 
 gsap.registerPlugin(ScrollTrigger);
+
+const MOBILE_BREAKPOINT = 1024;
 
 const pillars = [
   {
@@ -39,11 +43,83 @@ const pillars = [
   },
 ];
 
+function PillarCard({
+  icon: Icon,
+  label,
+  description,
+  image,
+  alt,
+  showHoverAsActive,
+}: (typeof pillars)[0] & { showHoverAsActive?: boolean }) {
+  return (
+    <div className="group relative h-[260px] overflow-hidden bg-zinc-950 sm:h-[320px] md:h-[420px] lg:h-[500px] xl:h-[600px]">
+      <div className="absolute inset-0">
+        <Image
+          src={image}
+          alt={alt}
+          fill
+          sizes="(max-width: 768px) 50vw, (max-width: 1024px) 50vw, 25vw"
+          className={`object-cover transition-all duration-700 ease-out group-hover:scale-105 group-hover:grayscale-0 ${showHoverAsActive ? "scale-105 grayscale-0" : ""}`}
+        />
+        <div
+          className={`absolute inset-0 bg-linear-to-t to-transparent transition-opacity duration-500 ${
+            showHoverAsActive
+              ? "from-zinc-950/95 via-zinc-950/60"
+              : "from-zinc-950/90 via-zinc-950/20 group-hover:from-zinc-950/95 group-hover:via-zinc-950/60"
+          }`}
+        />
+      </div>
+      <div className="relative flex h-full flex-col justify-end p-4 text-zinc-50 sm:p-6 lg:p-8">
+        <div
+          className={`transition-transform duration-500 ease-out ${
+            showHoverAsActive ? "-translate-y-2" : "group-hover:-translate-y-2"
+          }`}
+        >
+          <div
+            className={`mb-3 inline-flex size-9 items-center justify-center border transition-colors duration-500 sm:mb-4 sm:size-10 lg:mb-6 lg:size-12 ${
+              showHoverAsActive ? "border-zinc-50" : "border-zinc-50/30 group-hover:border-zinc-50"
+            }`}
+          >
+            <Icon className="size-4 sm:size-5" strokeWidth={1} />
+          </div>
+          <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-50 sm:text-xs lg:text-sm">
+            {label}
+          </h3>
+        </div>
+        <div
+          className={`grid transition-all duration-500 ease-out ${
+            showHoverAsActive ? "grid-rows-[1fr]" : "grid-rows-[0fr] group-hover:grid-rows-[1fr]"
+          }`}
+        >
+          <div className="overflow-hidden">
+            <p
+              className={`mt-2 text-[10px] leading-relaxed tracking-wide text-zinc-300 transition-opacity duration-500 delay-100 sm:mt-3 sm:text-xs lg:mt-4 ${
+                showHoverAsActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+              }`}
+            >
+              {description}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function WhyChooseUs() {
   const sectionRef = useRef<HTMLElement>(null);
   const labelRef = useRef<HTMLSpanElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
-  const cardsRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
+    setIsMobile(mq.matches);
+    const handler = () => setIsMobile(mq.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -58,7 +134,6 @@ export default function WhyChooseUs() {
           toggleActions: "play none none reverse",
         },
       });
-
       gsap.from(titleRef.current, {
         opacity: 0,
         y: 40,
@@ -70,89 +145,61 @@ export default function WhyChooseUs() {
           toggleActions: "play none none reverse",
         },
       });
-
-      gsap.from(cardsRef.current?.children ?? [], {
+      gsap.from(contentRef.current, {
         opacity: 0,
-        y: 50,
+        y: 40,
         duration: 0.8,
-        stagger: 0.12,
         ease: "power3.out",
         scrollTrigger: {
-          trigger: cardsRef.current,
+          trigger: contentRef.current,
           start: "top 80%",
           toggleActions: "play none none reverse",
         },
       });
     }, sectionRef);
-
     return () => ctx.revert();
   }, []);
 
   return (
     <section
       ref={sectionRef}
-      className="border-t border-zinc-200 bg-zinc-50 p-16"
+      className="border-t border-zinc-200 bg-zinc-50 py-8 sm:p-12 lg:p-16"
     >
       <div className="mx-auto max-w-[1400px]">
-        {/* 标题部分：改回了转化率极高的 Why Choose Us，同时保持了大牌排版 */}
         <span
           ref={labelRef}
-          className="mb-4 block text-center font-medium uppercase tracking-[0.4em] text-zinc-500"
+          className="mb-2 block text-center text-xs font-medium uppercase tracking-[0.35em] text-zinc-500 sm:mb-4 sm:text-sm sm:tracking-[0.4em]"
         >
           The House Difference
         </span>
         <h2
           ref={titleRef}
-          className="mb-20 text-center text-4xl font-bold uppercase tracking-tighter text-zinc-950 md:text-5xl lg:text-6xl"
+          className="mb-10 text-center text-2xl font-bold uppercase tracking-tighter text-zinc-950 sm:mb-14 sm:text-3xl md:text-4xl lg:mb-20 lg:text-5xl xl:text-6xl"
         >
           WHY CHOOSE US
         </h2>
 
-        {/* 卡片展示区：间距拉开，高级感悬停动效全开 */}
-        <div
-          ref={cardsRef}
-          className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-6"
-        >
-          {pillars.map(({ icon: Icon, label, description, image, alt }) => (
-            <div
-              key={label}
-              // 强制高度，打造修长的“巨石阵”画廊感
-              className="group relative h-[450px] overflow-hidden bg-zinc-950 md:h-[500px] lg:h-[600px]"
-            >
-              <div className="absolute inset-0">
-                <Image
-                  src={image}
-                  alt={alt}
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  className="object-cover transition-all duration-700 ease-out group-hover:scale-105 group-hover:grayscale-0"
-                />
-                <div className="absolute inset-0 bg-linear-to-t from-zinc-950/90 via-zinc-950/20 to-transparent transition-opacity duration-500 group-hover:from-zinc-950/95 group-hover:via-zinc-950/60" />
-              </div>
-
-              {/* 内容交互层 */}
-              <div className="relative flex h-full flex-col justify-end p-8 text-zinc-50">
-                {/* 1. 图标与标题：默认在底部，悬停时被下方的文字“顶”上去 */}
-                <div className="transform transition-transform duration-500 ease-out group-hover:-translate-y-2">
-                  <div className="mb-6 inline-flex size-12 items-center justify-center border border-zinc-50/30 transition-colors duration-500 group-hover:border-zinc-50">
-                    <Icon className="size-5" strokeWidth={1} />
-                  </div>
-                  <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-50">
-                    {label}
-                  </h3>
-                </div>
-
-                {/* 2. 描述文字：Tailwind Grid 黑科技实现高度的丝滑折叠与展开 */}
-                <div className="grid grid-rows-[0fr] transition-all duration-500 ease-out group-hover:grid-rows-[1fr]">
-                  <div className="overflow-hidden">
-                    <p className="mt-4 text-xs leading-relaxed tracking-wide text-zinc-300 opacity-0 transition-opacity duration-500 delay-100 group-hover:opacity-100">
-                      {description}
-                    </p>
-                  </div>
-                </div>
-              </div>
+        {/* Mobile: Swiper 一屏看 2 个 | Desktop: 原网格 */}
+        <div ref={contentRef}>
+          {isMobile ? (
+            <Swiper
+                slidesPerView={2}
+                spaceBetween={0}
+                className="overflow-visible!"
+              >
+                {pillars.map((pillar) => (
+                  <SwiperSlide key={pillar.label}>
+                    <PillarCard {...pillar} showHoverAsActive />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-6">
+              {pillars.map((pillar) => (
+                <PillarCard key={pillar.label} {...pillar} />
+              ))}
             </div>
-          ))}
+          )}
         </div>
       </div>
     </section>

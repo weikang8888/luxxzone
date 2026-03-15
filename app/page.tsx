@@ -4,8 +4,9 @@ import MenSection from "@/components/MenSection";
 import WomenSection from "@/components/WomenSection";
 import WhyChooseUs from "@/components/WhyChooseUs";
 import EditorialStrip from "@/components/EditorialStrip";
-import Testimonials from "@/components/Testimonials";
+import Feedback from "@/components/Feedback";
 import MoreAboutUs from "@/components/MoreAboutUs";
+import Footer from "@/components/Footer";
 
 export default function Home() {
   return (
@@ -17,14 +18,10 @@ export default function Home() {
         <WomenSection />
         <EditorialStrip />
         <WhyChooseUs />
-        <Testimonials />
+        <Feedback />
         <MoreAboutUs />
       </main>
-      <footer className="border-t border-zinc-200 bg-zinc-950 px-8 py-8 lg:px-16">
-        <p className="text-center text-sm font-light uppercase tracking-widest text-zinc-500">
-          © 2026 Luxxzone. All rights reserved.
-        </p>
-      </footer>
+      <Footer />
     </>
   );
 }

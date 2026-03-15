@@ -49,39 +49,36 @@ export default function MoreAboutUs() {
     <section
       ref={sectionRef}
       id="more-about-us"
-      className="border-t border-zinc-200 bg-zinc-50 p-16" // 增加了上下的留白(py-32)，让高级感更强
+      className="border-t border-zinc-200 bg-zinc-50 p-8 sm:p-12 lg:p-16"
     >
       <div
         ref={contentRef}
-        className="mx-auto flex max-w-3xl flex-col items-center gap-8 text-center"
+        className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center sm:gap-8"
       >
-        <span className="font-medium uppercase tracking-[0.4em] text-zinc-500">
+        <span className="text-xs font-medium uppercase tracking-[0.35em] text-zinc-500 sm:text-sm sm:tracking-[0.4em]">
           Stay Connected
         </span>
 
-        {/* 标题加大，改用大写，拉紧字间距，更有杂志大片感 */}
-        <h2 className="text-5xl font-bold uppercase tracking-tighter text-zinc-950 md:text-6xl lg:text-7xl">
+        <h2 className="text-3xl font-bold uppercase tracking-tighter text-zinc-950 sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">
           THE LUXXZONE <br /> COMMUNITY
         </h2>
 
-        <p className="max-w-xl text-zinc-500 md:text-lg">
+        <p className="max-w-xl text-sm text-zinc-500 sm:text-base md:text-lg">
           Join our community for exclusive drops, behind-the-scenes content, and
           direct updates from the House of Luxxzone.
         </p>
 
-        {/* 🌟 按钮剥夺了蓝色，使用你网站标志性的透明底+黑框，悬停反转 */}
-        {/* 🌟 修改这里：将 transition-all 改为 transition-colors */}
         <Button
           asChild
           variant="outline"
-          className="mt-4 inline-flex items-center gap-3 rounded-none border border-zinc-950 bg-transparent px-10 py-7 font-bold uppercase tracking-widest text-zinc-950 transition-colors duration-500 hover:bg-zinc-950 hover:text-zinc-50"
+          className="mt-2 inline-flex items-center gap-2 rounded-none border border-zinc-950 bg-zinc-950 px-6 py-5 text-xs font-bold uppercase tracking-widest text-zinc-50 transition-colors duration-500 sm:gap-3 sm:px-8 sm:py-6 sm:text-sm lg:bg-transparent lg:text-zinc-950 lg:hover:bg-zinc-950 lg:hover:text-zinc-50"
         >
           <Link
             href="https://t.me/luxxzone"
             target="_blank"
             rel="noopener noreferrer"
           >
-            <TelegramIcon className="size-5" />
+            <TelegramIcon className="size-4 sm:size-5" />
             Join Our Telegram
           </Link>
         </Button>
