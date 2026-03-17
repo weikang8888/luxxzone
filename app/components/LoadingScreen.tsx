@@ -2,77 +2,70 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function LoadingScreen() {
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
+    // 锁定滚动，确保加载时页面不动
     document.body.style.overflow = "hidden";
+    
+    // 强制 2.8 秒后彻底移除组件并恢复滚动
+    const timer = setTimeout(() => {
+      setIsVisible(false);
+      document.body.style.overflow = "";
+    }, 2000);
+
     return () => {
       document.body.style.overflow = "";
+      clearTimeout(timer);
     };
   }, []);
 
-  const handleExitComplete = () => {
-    setIsVisible(false);
-    document.body.style.overflow = "";
-  };
-
-  if (!isVisible) return null;
-
   return (
-    <motion.div className="fixed inset-0 z-999 flex items-center justify-center">
-        {/* 左右黑幕 */}
+    <AnimatePresence>
+      {isVisible && (
         <motion.div
-          initial={{ width: "50%" }}
-          animate={{ width: "0%" }}
-          transition={{
-            delay: 1.9,
-            duration: 1,
-            ease: [0.87, 0, 0.13, 1],
-          }}
-          className="absolute left-0 top-0 h-full bg-white"
-        />
-        <motion.div
-          initial={{ width: "50%" }}
-          animate={{ width: "0%" }}
-          transition={{
-            delay: 1.95,
-            duration: 1,
-            ease: [0.87, 0, 0.13, 1],
-          }}
-          className="absolute right-0 top-0 h-full bg-white"
-        />
-
-        {/* Logo */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9, filter: "blur(10px)" }}
-          animate={{
-            opacity: [0, 1, 1, 0],
-            scale: [0.9, 1, 1, 1.1],
-            filter: ["blur(10px)", "blur(0px)", "blur(0px)", "blur(0px)"],
-          }}
-          transition={{
-            duration: 2.1,
-            times: [0, 0.476, 0.714, 1],
-            ease: "easeInOut",
-          }}
-          onAnimationComplete={() => {
-            // Logo 2.1s 结束，帷幕 1.9s 开始、1s 时长，约 2.9s 结束，需再等 ~0.9s
-            setTimeout(handleExitComplete, 900);
-          }}
-          className="relative z-10 h-24 w-48 md:h-32 md:w-64"
+          initial={{ opacity: 1 }}
+          exit={{ opacity: 0 }} // 🌟 核心：退出时整场渐隐
+          transition={{ duration: 1, ease: [0.43, 0.13, 0.23, 0.96] }}
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-white"
         >
-          <Image
-            src="/logo.png"
-            alt="Luxxzone"
-            width={200}
-            height={200}
-            className="object-contain"
-            priority
+          {/* Logo 动画：浮现 -> 停留 -> 放大微散 */}
+          <motion.div
+            initial={{ opacity: 0, y: 10, filter: "blur(10px)" }}
+            animate={{
+              opacity: [0, 1, 1, 0],
+              y: [10, 0, 0, -5],
+              filter: ["blur(10px)", "blur(0px)", "blur(0px)", "blur(5px)"],
+              scale: [0.95, 1, 1, 1.05],
+            }}
+            transition={{
+              duration: 2.2,
+              times: [0, 0.3, 0.8, 1],
+              ease: "easeInOut",
+            }}
+            className="relative h-24 w-48 md:h-32 md:w-64"
+          >
+            <Image
+              src="/logo.png"
+              alt="Luxxzone"
+              fill
+              className="object-contain"
+              priority
+            />
+          </motion.div>
+
+          {/* 装饰性背景：可选，增加一点高级感 */}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.05 }}
+            transition={{ duration: 1.5 }}
+            className="absolute inset-0 bg-[radial-gradient(circle,rgba(0,0,0,0.05)_1px,transparent_1px)] bg-[length:24px_24px]" 
           />
         </motion.div>
-    </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
