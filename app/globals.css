@@ -9,14 +9,20 @@
   /* 在这里定义你的奢侈品配色，v4 允许直接在 CSS 中定义主题 */
   --color-brand-black: #09090b;
   --color-brand-white: #ffffff;
-  
+
   /* 也可以自定义字体间距，方便全站调用 */
   --letter-spacing-luxury: 0.3em;
+}
+
+/* 防止 Swiper 等组件在手机上产生横向滚动 */
+html,
+body {
+  overflow-x: clip;
+  overscroll-behavior-x: none;
 }
 
 /* 这里的 body 设置会应用到全站 */
 body {
   @apply antialiased;
   letter-spacing: -0.02em;
-  overflow-x: hidden;
 }

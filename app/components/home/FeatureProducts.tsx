@@ -136,7 +136,7 @@ export default function FeaturedProducts() {
 
             {/* Mobile: 直接渲染 Swiper，避免 motion opacity 导致不显示 */}
             {isMobile ? (
-                <div className="mx-auto max-w-[1400px]">
+                <div className="mx-auto max-w-[1400px] overflow-x-clip">
                     <Swiper
                         effect="coverflow"
                         modules={[EffectCoverflow, Autoplay]}

@@ -148,6 +148,7 @@ export default function WhyChooseUs() {
           variants={staggerContainer}
         >
           {isMobile ? (
+            <div className="overflow-x-clip -mx-6 px-6">
             <Swiper slidesPerView={1.2} spaceBetween={16} className="!overflow-visible">
               {pillars.map((pillar) => (
                 <SwiperSlide key={pillar.label}>
@@ -155,6 +156,7 @@ export default function WhyChooseUs() {
                 </SwiperSlide>
               ))}
             </Swiper>
+            </div>
           ) : (
             <div className="grid grid-cols-4 gap-2">
               {pillars.map((pillar) => (
