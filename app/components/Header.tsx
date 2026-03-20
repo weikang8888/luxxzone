@@ -6,29 +6,51 @@ import { Menu, Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import MobileMenu from "./MobileMenu";
+import { useCategories } from "@/app/hooks/useCategories";
 
-const categories = [
-    { label: "New Arrivals", slug: "new-arrivals" },
-    { label: "Clothing", slug: "clothing" },
-    { label: "Shoes", slug: "shoes" },
-    { label: "Bags", slug: "bags" },
-    { label: "Accessories", slug: "accessories" },
-    { label: "Sale", slug: "sale" },
-];
+type ApiCategory = { id: number; name: string; sex_degree: number; sub_categories: { id: number; name: string }[] };
+type NavCategory = { id: number; label: string; slug: string; sub_categories: { id: number; label: string; href: string }[] };
+
+function nameToSlug(name: string) {
+    return name.toLowerCase().replace(/\s+/g, "-");
+}
+
+function apiToNavCategories(data: ApiCategory[], sexDegree: number, gender: "men" | "women"): NavCategory[] {
+    return data
+        .filter((c) => c.sex_degree === sexDegree)
+        .map((c) => {
+            const slug = nameToSlug(c.name);
+            const baseHref = `/${gender}/${slug}`;
+            const sub_categories = c.sub_categories.map((sub) => ({
+                id: sub.id,
+                label: sub.name,
+                href: `/${gender}/${slug}?sub=${sub.id}`,
+            }));
+            if (sub_categories.length > 0) {
+                sub_categories.unshift({ id: 0, label: "Shop All", href: baseHref });
+            }
+            return { id: c.id, label: c.name, slug, sub_categories };
+        });
+}
 
 export default function Header() {
     const router = useRouter();
     const params = useParams();
     const searchParams = useSearchParams();
 
-    // 狀態管理 - 使用固定初始值避免 SSR/CSR 水合不匹配，再在 useEffect 中從 URL 同步
-    const slug = typeof params.slug === "string" ? params.slug : "";
-    const [activeGender, setActiveGender] = useState<"men" | "women">("women");
+    const categorySlug = typeof params.slug === "string" ? params.slug : "";
+    const [activeGender, setActiveGender] = useState<"men" | "women">("men");
+
+    const { data: apiCategories = [] } = useCategories();
 
     useEffect(() => {
-        const gender = (searchParams.get("gender") as "men" | "women") || "women";
-        setActiveGender(gender);
-    }, [searchParams]);
+        const pathGender = params.gender === "men" || params.gender === "women" ? params.gender : null;
+        if (pathGender) setActiveGender(pathGender);
+        else setActiveGender((searchParams.get("gender") as "men" | "women") || "men");
+    }, [params.gender, searchParams]);
+
+    const sexDegree = activeGender === "men" ? 1 : 2;
+    const categories = apiToNavCategories(apiCategories, sexDegree, activeGender);
     const [isScrolled, setIsScrolled] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -52,7 +74,18 @@ export default function Header() {
 
     const handleGenderSwitch = (gender: "men" | "women") => {
         setActiveGender(gender);
-        if (slug) router.push(`/category/${slug}?gender=${gender}`);
+        if (!categorySlug) return;
+        const currentSub = searchParams.get("sub");
+        const sexDegree = gender === "men" ? 1 : 2;
+        const mainCat = apiCategories.find((c) => c.sex_degree === (activeGender === "men" ? 1 : 2) && nameToSlug(c.name) === categorySlug);
+        const subCat = mainCat?.sub_categories.find((s) => String(s.id) === currentSub);
+        const targetParent = apiCategories.find((c) => c.sex_degree === sexDegree && nameToSlug(c.name) === categorySlug);
+        if (targetParent) {
+            const subParam = subCat && targetParent.sub_categories.length > 0
+                ? `?sub=${targetParent.sub_categories.find((s) => s.name === subCat.name)?.id ?? ""}`
+                : "";
+            router.push(`/${gender}/${categorySlug}${subParam}`);
+        }
     };
 
     return (
@@ -64,6 +97,7 @@ export default function Header() {
                 onClose={() => setIsMobileMenuOpen(false)}
                 activeGender={activeGender}
                 onGenderSwitch={handleGenderSwitch}
+                categories={categories}
             />
 
             {/* --- 2. Search Overlay --- */}
@@ -139,8 +173,8 @@ export default function Header() {
                     <nav className="mx-auto flex h-14 max-w-5xl items-center justify-center gap-12">
                         {categories.map((item) => (
                             <Link
-                                key={item.label}
-                                href={`/category/${item.slug}?gender=${activeGender}`}
+                                key={item.id}
+                                href={`/${activeGender}/${item.slug}`}
                                 className={`group relative text-[11px] font-black uppercase tracking-[0.15em] transition-colors ${isScrolled ? "text-zinc-400 hover:text-white" : "text-zinc-500 hover:text-black"}`}
                             >
                                 {item.label}

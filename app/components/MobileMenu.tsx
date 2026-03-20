@@ -2,20 +2,12 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { X, ChevronRight, MessageCircle, Instagram, Facebook } from "lucide-react";
+import { X, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { DROPDOWN_CATEGORIES, categorySubItems } from "@/lib/nav";
 import { WHATSAPP_NUMBER } from "@/lib/constants";
 
-const categories = [
-    { label: "New Arrivals", slug: "new-arrivals" },
-    { label: "Clothing", slug: "clothing" },
-    { label: "Shoes", slug: "shoes" },
-    { label: "Bags", slug: "bags" },
-    { label: "Accessories", slug: "accessories" },
-    { label: "Sale", slug: "sale" },
-];
+type NavCategory = { id: number; label: string; slug: string; sub_categories: { id: number; label: string; href: string }[] };
 
 const menuVariants = {
     hidden: { opacity: 0, x: -20 },
@@ -31,9 +23,10 @@ type Props = {
     onClose: () => void;
     activeGender: "men" | "women";
     onGenderSwitch: (gender: "men" | "women") => void;
+    categories: NavCategory[];
 };
 
-export default function MobileMenu({ isOpen, onClose, activeGender, onGenderSwitch }: Props) {
+export default function MobileMenu({ isOpen, onClose, activeGender, onGenderSwitch, categories }: Props) {
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
     useEffect(() => {
@@ -80,14 +73,13 @@ export default function MobileMenu({ isOpen, onClose, activeGender, onGenderSwit
             <div className="flex-1 overflow-y-auto px-8">
                 <nav className="flex flex-col border-t border-zinc-100">
                     {categories.map((item, idx) => {
-                        const hasSubItems = DROPDOWN_CATEGORIES.includes(item.label);
+                        const hasSubItems = item.sub_categories.length > 0;
                         const isExpanded = openDropdown === item.label;
-                        const subItems = categorySubItems[item.label];
 
                         if (hasSubItems) {
                             return (
                                 <motion.div
-                                    key={item.label}
+                                    key={item.id}
                                     custom={idx}
                                     initial="hidden"
                                     animate={isOpen ? "visible" : "hidden"}
@@ -107,10 +99,10 @@ export default function MobileMenu({ isOpen, onClose, activeGender, onGenderSwit
                                     <div className={`grid transition-all duration-300 ease-out ${isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
                                         <div className="overflow-hidden">
                                             <div className="flex flex-wrap gap-x-6 gap-y-4 pb-6 pl-0">
-                                                {subItems?.map((sub) => (
+                                                {item.sub_categories.map((sub) => (
                                                     <Link
-                                                        key={sub.label}
-                                                        href={`${sub.href}?gender=${activeGender}`}
+                                                        key={sub.id}
+                                                        href={sub.href}
                                                         className="text-[12px] font-bold uppercase tracking-widest text-zinc-400 hover:text-black"
                                                         onClick={onClose}
                                                     >
@@ -126,14 +118,14 @@ export default function MobileMenu({ isOpen, onClose, activeGender, onGenderSwit
 
                         return (
                             <motion.div
-                                key={item.label}
+                                key={item.id}
                                 custom={idx}
                                 initial="hidden"
                                 animate={isOpen ? "visible" : "hidden"}
                                 variants={menuVariants}
                             >
                                 <Link
-                                    href={item.slug === "sale" ? `/sale?gender=${activeGender}` : `/category/${item.slug}?gender=${activeGender}`}
+                                    href={`/${activeGender}/${item.slug}`}
                                     onClick={onClose}
                                     className="flex items-center justify-between border-b border-zinc-100 py-6"
                                 >

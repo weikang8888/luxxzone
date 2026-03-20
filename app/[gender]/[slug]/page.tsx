@@ -3,30 +3,16 @@
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown, MessageCircle } from "lucide-react";
-import { clothingBrandOptions, WHATSAPP_NUMBER } from "@/lib/constants";
+import { WHATSAPP_NUMBER } from "@/lib/constants";
+import { useCategories } from "@/app/hooks/useCategories";
+import { useProductList } from "@/app/hooks/useProductList";
 
-// --- 数据配置 ---
-const categoryData = {
-    men: [
-        { name: "New Arrivals", slug: "new-arrivals" },
-        { name: "Clothing", slug: "clothing" },
-        { name: "Shoes", slug: "shoes" },
-        { name: "Bags", slug: "bags" },
-        { name: "Accessories", slug: "accessories" },
-        { name: "Sale", slug: "sale" },
-    ],
-    women: [
-        { name: "New Arrivals", slug: "new-arrivals" },
-        { name: "Clothing", slug: "clothing" },
-        { name: "Shoes", slug: "shoes" },
-        { name: "Bags", slug: "bags" },
-        { name: "Accessories", slug: "accessories" },
-        { name: "Sale", slug: "sale" },
-    ]
-};
+function nameToSlug(name: string) {
+    return name.toLowerCase().replace(/\s+/g, "-");
+}
 
 const sortOptions = [
     { label: "Newest Arrivals", value: "newest" },
@@ -34,14 +20,7 @@ const sortOptions = [
     { label: "Price: Low to High", value: "price-asc" },
 ];
 
-const dummyProducts = [
-    { id: 1, name: "Oversized Wool Coat", image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=800", badge: "New" },
-    { id: 2, name: "Structured Blazer", image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=800", badge: null },
-    { id: 3, name: "Wide-Leg Trousers", image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=80&w=800", badge: "Best Seller" },
-    { id: 4, name: "Cashmere Sweater", image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=800", badge: null },
-    { id: 5, name: "Leather Jacket", image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=800", badge: "Sale" },
-    { id: 6, name: "Silk Shirt", image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=800", badge: null },
-];
+type ProductItem = { id: number; name: string; image?: string; badge?: string | null };
 
 export default function CategoryPage() {
     const params = useParams();
@@ -49,28 +28,45 @@ export default function CategoryPage() {
     const router = useRouter();
 
     const [isSortOpen, setIsSortOpen] = useState(false);
-    const [isClothingExpanded, setIsClothingExpanded] = useState(false);
-    // 使用 state 與固定預設值，避免 SSR/CSR 水合不匹配；在 useEffect 中從 URL 同步
-    const [currentGender, setCurrentGender] = useState<"men" | "women">("men");
     const [currentSort, setCurrentSort] = useState("newest");
-    const [currentBrand, setCurrentBrand] = useState("");
 
+    const gender = (params.gender === "men" || params.gender === "women") ? params.gender : "men";
     const slug = typeof params.slug === "string" ? params.slug : "";
+    const subParam = searchParams.get("sub");
+    const sub_category_id = subParam ? parseInt(subParam, 10) : undefined;
+
+    const { data: apiCategories = [] } = useCategories();
 
     useEffect(() => {
-        setCurrentGender((searchParams.get("gender") as "men" | "women") || "men");
         setCurrentSort(searchParams.get("sort") || "newest");
-        setCurrentBrand(searchParams.get("brand") || "");
-        setIsClothingExpanded(params.slug === "clothing");
-    }, [searchParams, params.slug]);
+    }, [searchParams]);
 
+    const sexDegree = gender === "men" ? 1 : 2;
+    const currentCategory = useMemo(
+        () => apiCategories.find((c) => c.sex_degree === sexDegree && nameToSlug(c.name) === slug),
+        [apiCategories, sexDegree, slug]
+    );
+
+    const { data: products = [], isLoading } = useProductList(currentCategory?.id, sexDegree, sub_category_id);
+
+    const sidebarCategories = useMemo(
+        () => apiCategories.filter((c) => c.sex_degree === sexDegree),
+        [apiCategories, sexDegree]
+    );
+
+    const basePath = `/${gender}/${slug}`;
+    const fullPath = subParam ? `${basePath}?sub=${subParam}` : basePath;
 
     const handleSortSelect = (sortValue: string) => {
         const p = new URLSearchParams(searchParams.toString());
         p.set("sort", sortValue);
-        router.push(`/category/${slug}?${p.toString()}`);
+        router.push(`${basePath}?${p.toString()}`);
         setIsSortOpen(false);
     };
+
+    const displayTitle = sub_category_id && currentCategory
+        ? currentCategory.sub_categories.find((s) => s.id === sub_category_id)?.name ?? slug.replace(/-/g, " ")
+        : slug.replace(/-/g, " ");
 
     return (
         <main className="min-h-screen bg-white pb-20 pt-24 md:pt-32 lg:pt-40">
@@ -87,36 +83,46 @@ export default function CategoryPage() {
                         >
                             <h2 className="mb-8 text-[10px] font-black uppercase tracking-[0.4em] text-zinc-300">Navigation</h2>
                             <nav className="flex flex-col space-y-7">
-                                {categoryData[currentGender].map((cat) => (
-                                    <div key={cat.slug} className="flex flex-col">
-                                        <div className="flex items-center justify-between">
-                                            <Link
-                                                href={`/category/${cat.slug}?gender=${currentGender}`}
-                                                className={`text-[11px] font-black uppercase tracking-widest transition-all ${slug === cat.slug ? "text-black" : "text-zinc-400 hover:text-black"}`}
-                                            >
-                                                {cat.name}
-                                            </Link>
-                                            {cat.slug === "clothing" && (
-                                                <button type="button" onClick={() => setIsClothingExpanded(!isClothingExpanded)}>
-                                                    <ChevronDown className={`size-4 transition-transform ${isClothingExpanded ? "rotate-180" : ""}`} />
-                                                </button>
+                                {sidebarCategories.map((cat) => {
+                                    const catSlug = nameToSlug(cat.name);
+                                    const hasSubs = cat.sub_categories.length > 0;
+                                    const isExpanded = slug === catSlug;
+                                    const baseHref = `/${gender}/${catSlug}`;
+                                    return (
+                                        <div key={cat.id} className="flex flex-col">
+                                            <div className="flex items-center justify-between">
+                                                <Link
+                                                    href={baseHref}
+                                                    className={`text-[11px] font-black uppercase tracking-widest transition-all ${slug === catSlug ? "text-black" : "text-zinc-400 hover:text-black"}`}
+                                                >
+                                                    {cat.name}
+                                                </Link>
+                                                {hasSubs && (
+                                                    <ChevronDown className={`size-4 shrink-0 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
+                                                )}
+                                            </div>
+                                            {hasSubs && isExpanded && (
+                                                <div className="mt-6 flex flex-col space-y-4 border-l border-zinc-100 pl-4">
+                                                    <Link
+                                                        href={baseHref}
+                                                        className={`text-[9px] font-bold uppercase tracking-widest ${slug === catSlug && !sub_category_id ? "text-black" : "text-zinc-400 hover:text-black"}`}
+                                                    >
+                                                        Shop All
+                                                    </Link>
+                                                    {cat.sub_categories.map((sub) => (
+                                                        <Link
+                                                            key={sub.id}
+                                                            href={`/${gender}/${catSlug}?sub=${sub.id}`}
+                                                            className={`text-[9px] font-bold uppercase tracking-widest ${sub_category_id === sub.id ? "text-black" : "text-zinc-400 hover:text-black"}`}
+                                                        >
+                                                            {sub.name}
+                                                        </Link>
+                                                    ))}
+                                                </div>
                                             )}
                                         </div>
-                                        {cat.slug === "clothing" && isClothingExpanded && (
-                                            <div className="mt-6 flex flex-col space-y-4 border-l border-zinc-100 pl-4">
-                                                {clothingBrandOptions.map((brand) => (
-                                                    <Link
-                                                        key={brand}
-                                                        href={`/category/clothing?gender=${currentGender}&brand=${brand.toLowerCase().replace(/\s+/g, "-")}`}
-                                                        className={`text-[9px] font-bold uppercase tracking-widest ${currentBrand === brand.toLowerCase().replace(/\s+/g, "-") ? "text-black" : "text-zinc-400 hover:text-black"}`}
-                                                    >
-                                                        {brand}
-                                                    </Link>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </nav>
                         </motion.div>
                     </div>
@@ -125,16 +131,14 @@ export default function CategoryPage() {
                 {/* --- 2. Main Content --- */}
                 <section className="flex-1 min-w-0">
                     <div className="mb-12 flex flex-col border-b border-zinc-100 pb-10">
-                        {/* 标题 */}
                         <div className="mb-8">
-                            <span className="mb-4 block text-[10px] font-bold uppercase tracking-[0.5em] text-zinc-300">Luxxzone / {currentGender}</span>
-                            <h1 className="text-5xl font-black uppercase leading-none tracking-tighter md:text-8xl">{slug.replace(/-/g, " ")}</h1>
+                            <span className="mb-4 block text-[10px] font-bold uppercase tracking-[0.5em] text-zinc-300">Luxxzone / {gender}</span>
+                            <h1 className="text-5xl font-black uppercase leading-none tracking-tighter md:text-8xl">{displayTitle}</h1>
                         </div>
 
-                        {/* 🌟 Total & Sort Row (Mobile 优化) */}
                         <div className="flex items-end justify-between md:items-center">
                             <p className="text-[11px] font-black uppercase tracking-widest text-zinc-400">
-                                Total: {dummyProducts.length} <span className="hidden sm:inline">Items</span>
+                                Total: {products.length} <span className="hidden sm:inline">Items</span>
                             </p>
 
                             <div className="relative">
@@ -165,7 +169,13 @@ export default function CategoryPage() {
                         </div>
                     </div>
 
-                    {/* 商品网格 */}
+                    {isLoading ? (
+                        <div className="grid grid-cols-2 gap-x-6 gap-y-16 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-10">
+                            {[...Array(8)].map((_, i) => (
+                                <div key={i} className="aspect-[3/4] animate-pulse bg-zinc-100" />
+                            ))}
+                        </div>
+                    ) : (
                     <motion.div
                         initial="hidden"
                         whileInView="visible"
@@ -179,19 +189,17 @@ export default function CategoryPage() {
                         }}
                         className="grid grid-cols-2 gap-x-6 gap-y-16 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-10"
                     >
-                        {dummyProducts.map((p) => (
+                        {(products as ProductItem[]).map((p) => (
                             <motion.div
                                 key={p.id}
                                 variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } }}
                                 transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
                                 className="group flex flex-col"
                             >
-                                
-                                {/* 1. 图片区：纯净无遮挡 */}
                                 <div className="relative aspect-[3/4] overflow-hidden bg-zinc-50 mb-6 transition-transform duration-500 hover:shadow-xl">
                                     <Link href={`/product/${p.id}`}>
                                         <Image
-                                            src={p.image}
+                                            src={p.image ?? "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=800"}
                                             alt={p.name}
                                             fill
                                             className="object-cover transition-transform duration-[1.5s] ease-out md:group-hover:scale-105"
@@ -205,7 +213,6 @@ export default function CategoryPage() {
                                     )}
                                 </div>
 
-                                {/* 2. 商品文字信息 */}
                                 <div className="mb-5 px-1">
                                     <h3 className="text-[10px] font-black uppercase tracking-widest mb-1 truncate text-zinc-950">
                                         {p.name}
@@ -215,7 +222,6 @@ export default function CategoryPage() {
                                     </p>
                                 </div>
 
-                                {/* 3. WhatsApp 按钮：最底部，经典青色 */}
                                 <div className="mt-auto">
                                     <a
                                         href={`https://wa.me/${WHATSAPP_NUMBER}?text=Hi, I am interested in ${p.name}`}
@@ -230,6 +236,7 @@ export default function CategoryPage() {
                             </motion.div>
                         ))}
                     </motion.div>
+                    )}
                 </section>
             </div>
         </main>

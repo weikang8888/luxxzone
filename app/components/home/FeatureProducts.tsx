@@ -181,7 +181,7 @@ export default function FeaturedProducts() {
 
             <div className="mt-20 flex justify-center">
                 <Link
-                    href="/category/new-arrivals?gender=women"
+                    href="/women/new-arrivals"
                     className="inline-flex rounded-none border border-zinc-700 px-12 py-7 text-[11px] font-bold uppercase tracking-widest text-white transition-all duration-500 hover:bg-white hover:text-black"
                 >
                     View Full Collection

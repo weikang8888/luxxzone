@@ -82,7 +82,7 @@ export default function WomenSection() {
                             Fluid lines. Effortless elegance. Curated for the modern woman who values timeless silhouette.
                         </p>
                         <Link
-                            href="/category/clothing?gender=women"
+                            href="/women/clothing"
                             className="group relative mt-10 flex h-16 w-fit overflow-hidden rounded-none border border-white bg-transparent px-10 py-7 text-[11px] font-black uppercase tracking-[0.3em] text-white transition-all duration-700 hover:border-black hover:text-white"
                         >
                             <span className="relative z-10 flex items-center justify-center gap-3">
@@ -112,7 +112,7 @@ export default function WomenSection() {
                             className={`group relative flex flex-col overflow-hidden ${category.gridClass}`}
                         >
                             <Link
-                                href="/category/clothing?gender=women"
+                                href="/women/clothing"
                                 className="flex h-full min-h-0 flex-col"
                             >
                                 <div className="relative min-h-[180px] flex-1 overflow-hidden bg-zinc-100 md:min-h-[200px]">
