@@ -34,6 +34,8 @@ export default function CategoryPage() {
     const slug = typeof params.slug === "string" ? params.slug : "";
     const subParam = searchParams.get("sub");
     const sub_category_id = subParam ? parseInt(subParam, 10) : undefined;
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || "12", 10);
 
     const { data: apiCategories = [] } = useCategories();
 
@@ -47,7 +49,11 @@ export default function CategoryPage() {
         [apiCategories, sexDegree, slug]
     );
 
-    const { data: products = [], isLoading } = useProductList(currentCategory?.id, sexDegree, sub_category_id);
+    const { data: products = [], isLoading } = useProductList(currentCategory?.id, sexDegree, {
+        sub_category_id,
+        page,
+        limit,
+    });
 
     const sidebarCategories = useMemo(
         () => apiCategories.filter((c) => c.sex_degree === sexDegree),
@@ -67,6 +73,10 @@ export default function CategoryPage() {
     const displayTitle = sub_category_id && currentCategory
         ? currentCategory.sub_categories.find((s) => s.id === sub_category_id)?.name ?? slug.replace(/-/g, " ")
         : slug.replace(/-/g, " ");
+
+    const breadcrumb = sub_category_id && currentCategory
+        ? `Luxxzone / ${gender} / ${currentCategory.name}`
+        : `Luxxzone / ${gender}`;
 
     return (
         <main className="min-h-screen bg-white pb-20 pt-24 md:pt-32 lg:pt-40">
@@ -132,7 +142,7 @@ export default function CategoryPage() {
                 <section className="flex-1 min-w-0">
                     <div className="mb-12 flex flex-col border-b border-zinc-100 pb-10">
                         <div className="mb-8">
-                            <span className="mb-4 block text-[10px] font-bold uppercase tracking-[0.5em] text-zinc-300">Luxxzone / {gender}</span>
+                            <span className="mb-4 block text-[10px] font-bold uppercase tracking-[0.5em] text-zinc-300">{breadcrumb}</span>
                             <h1 className="text-5xl font-black uppercase leading-none tracking-tighter md:text-8xl">{displayTitle}</h1>
                         </div>
 
@@ -176,66 +186,66 @@ export default function CategoryPage() {
                             ))}
                         </div>
                     ) : (
-                    <motion.div
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true, amount: 0.1 }}
-                        variants={{
-                            hidden: { opacity: 0 },
-                            visible: {
-                                opacity: 1,
-                                transition: { staggerChildren: 0.1, delayChildren: 0 },
-                            },
-                        }}
-                        className="grid grid-cols-2 gap-x-6 gap-y-16 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-10"
-                    >
-                        {(products as ProductItem[]).map((p) => (
-                            <motion.div
-                                key={p.id}
-                                variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } }}
-                                transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-                                className="group flex flex-col"
-                            >
-                                <div className="relative aspect-[3/4] overflow-hidden bg-zinc-50 mb-6 transition-transform duration-500 hover:shadow-xl">
-                                    <Link href={`/product/${p.id}`}>
-                                        <Image
-                                            src={p.image ?? "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=800"}
-                                            alt={p.name}
-                                            fill
-                                            className="object-cover transition-transform duration-[1.5s] ease-out md:group-hover:scale-105"
-                                            sizes="(max-width: 768px) 50vw, 25vw"
-                                        />
-                                    </Link>
-                                    {p.badge && (
-                                        <span className="absolute left-0 top-4 bg-black px-2 py-1 text-[8px] font-black uppercase tracking-widest text-white">
-                                            {p.badge}
-                                        </span>
-                                    )}
-                                </div>
+                        <motion.div
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true, amount: 0.1 }}
+                            variants={{
+                                hidden: { opacity: 0 },
+                                visible: {
+                                    opacity: 1,
+                                    transition: { staggerChildren: 0.1, delayChildren: 0 },
+                                },
+                            }}
+                            className="grid grid-cols-2 gap-x-6 gap-y-16 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-10"
+                        >
+                            {(products as ProductItem[]).map((p) => (
+                                <motion.div
+                                    key={p.id}
+                                    variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } }}
+                                    transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+                                    className="group flex flex-col"
+                                >
+                                    <div className="relative aspect-[3/4] overflow-hidden bg-zinc-50 mb-6 transition-transform duration-500 hover:shadow-xl">
+                                        <Link href={`/product/${p.id}`}>
+                                            <Image
+                                                src={p.image ?? "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=800"}
+                                                alt={p.name}
+                                                fill
+                                                className="object-cover transition-transform duration-[1.5s] ease-out md:group-hover:scale-105"
+                                                sizes="(max-width: 768px) 50vw, 25vw"
+                                            />
+                                        </Link>
+                                        {p.badge && (
+                                            <span className="absolute left-0 top-4 bg-black px-2 py-1 text-[8px] font-black uppercase tracking-widest text-white">
+                                                {p.badge}
+                                            </span>
+                                        )}
+                                    </div>
 
-                                <div className="mb-5 px-1">
-                                    <h3 className="text-[10px] font-black uppercase tracking-widest mb-1 truncate text-zinc-950">
-                                        {p.name}
-                                    </h3>
-                                    <p className="text-[9px] font-medium tracking-[0.2em] text-zinc-400 italic">
-                                        Seasonal Edition
-                                    </p>
-                                </div>
+                                    <div className="mb-5 px-1">
+                                        <h3 className="text-[10px] font-black uppercase tracking-widest mb-1 truncate text-zinc-950">
+                                            {p.name}
+                                        </h3>
+                                        <p className="text-[9px] font-medium tracking-[0.2em] text-zinc-400 italic">
+                                            Seasonal Edition
+                                        </p>
+                                    </div>
 
-                                <div className="mt-auto">
-                                    <a
-                                        href={`https://wa.me/${WHATSAPP_NUMBER}?text=Hi, I am interested in ${p.name}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex w-full items-center justify-center gap-3 bg-[#25D366] py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white transition-all active:scale-95 hover:bg-[#20ba5a] shadow-sm"
-                                    >
-                                        <MessageCircle className="size-4" />
-                                        <span>INQUIRE NOW</span>
-                                    </a>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </motion.div>
+                                    <div className="mt-auto">
+                                        <a
+                                            href={`https://wa.me/${WHATSAPP_NUMBER}?text=Hi, I am interested in ${p.name}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex w-full items-center justify-center gap-3 bg-[#25D366] py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white transition-all active:scale-95 hover:bg-[#20ba5a] shadow-sm"
+                                        >
+                                            <MessageCircle className="size-4" />
+                                            <span>INQUIRE NOW</span>
+                                        </a>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </motion.div>
                     )}
                 </section>
             </div>

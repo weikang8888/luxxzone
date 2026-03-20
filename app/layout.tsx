@@ -32,7 +32,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${archivo.variable}`}>
-      <body className="antialiased bg-white text-black selection:bg-black selection:text-white">
+      <body
+        className="antialiased bg-white text-black selection:bg-black selection:text-white"
+        suppressHydrationWarning
+      >
         <QueryProvider>
           {/* 1. 仪式感开场：优先级最高，覆盖全层 */}
           <LoadingScreen />
