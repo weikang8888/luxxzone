@@ -1,35 +1,57 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { MessageCircle, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { WHATSAPP_NUMBER } from "@/lib/constants";
-
-const product = {
-    id: 1,
-    name: "Oversized Wool Blend Coat",
-    collection: "Series 01 / SS 2026",
-    description: "Crafted from a premium wool blend, this oversized coat features architectural shoulders and a clean, hidden placket.",
-    details: ["80% Virgin Wool", "Relaxed fit", "Made in Italy"],
-    images: [
-        "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=1200",
-        "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=1200",
-        "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1600",
-        "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=1200",
-        "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=80&w=1200",
-    ]
-};
+import { useProductDetail } from "@/app/hooks/useProductDetail";
 
 export default function ProductDetailPage() {
+    const params = useParams();
+    const id = typeof params.id === "string" ? parseInt(params.id, 10) : undefined;
+    const { data: product, isLoading, isError } = useProductDetail(id);
+
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
     const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null);
 
-    // 禁用背景滚动
     useEffect(() => {
         if (activeImageIndex !== null) document.body.style.overflow = "hidden";
         else document.body.style.overflow = "";
     }, [activeImageIndex]);
+
+    if (isLoading) {
+        return (
+            <main className="min-h-screen bg-white pb-20 pt-24 md:pt-40">
+                <div className="mx-auto flex max-w-[1920px] flex-col gap-10 px-6 md:flex-row md:px-16">
+                    <div className="flex-1 space-y-4">
+                        <div className="aspect-[3/4] animate-pulse bg-zinc-100" />
+                    </div>
+                    <aside className="w-full md:w-[35%]">
+                        <div className="h-96 animate-pulse bg-zinc-100" />
+                    </aside>
+                </div>
+            </main>
+        );
+    }
+
+    if (isError || !product) {
+        return (
+            <main className="flex min-h-screen items-center justify-center bg-white">
+                <div className="text-center">
+                    <p className="mb-4 text-zinc-500">Product not found</p>
+                    <Link href="/" className="text-sm font-bold uppercase tracking-widest underline">
+                        Back to home
+                    </Link>
+                </div>
+            </main>
+        );
+    }
+
+    const images = product.images;
+    const details = product.details ?? [];
 
     return (
         <main className="min-h-screen bg-white pb-20 pt-24 md:pt-40">
@@ -54,7 +76,7 @@ export default function ProductDetailPage() {
                         {/* 主圖容器 */}
                         <div className="relative h-[85vh] w-[85vw] md:h-[90vh] md:w-[70vw]">
                             <Image
-                                src={product.images[activeImageIndex]}
+                                src={images[activeImageIndex]}
                                 alt="Zoomed Product View"
                                 fill
                                 className="object-contain"
@@ -65,7 +87,7 @@ export default function ProductDetailPage() {
                         {/* 🌟 核心修正：更明顯且靠邊的導航箭頭 */}
                         <div className="absolute inset-x-4 md:inset-x-10 top-1/2 flex -translate-y-1/2 justify-between pointer-events-none">
                             <button
-                                onClick={() => setActiveImageIndex((prev) => (prev! > 0 ? prev! - 1 : product.images.length - 1))}
+                                onClick={() => setActiveImageIndex((prev) => (prev! > 0 ? prev! - 1 : images.length - 1))}
                                 className="pointer-events-auto flex size-14 md:size-20 items-center justify-center rounded-full bg-zinc-50/50 text-zinc-950 transition-all hover:bg-zinc-950 hover:text-white group active:scale-90 shadow-sm"
                                 aria-label="Previous image"
                             >
@@ -73,7 +95,7 @@ export default function ProductDetailPage() {
                             </button>
 
                             <button
-                                onClick={() => setActiveImageIndex((prev) => (prev! < product.images.length - 1 ? prev! + 1 : 0))}
+                                onClick={() => setActiveImageIndex((prev) => (prev! < images.length - 1 ? prev! + 1 : 0))}
                                 className="pointer-events-auto flex size-14 md:size-20 items-center justify-center rounded-full bg-zinc-50/50 text-zinc-950 transition-all hover:bg-zinc-950 hover:text-white group active:scale-90 shadow-sm"
                                 aria-label="Next image"
                             >
@@ -83,7 +105,7 @@ export default function ProductDetailPage() {
 
                         {/* 頁碼計數 */}
                         <div className="absolute bottom-12 text-[10px] font-black uppercase tracking-[0.5em] text-zinc-400">
-                            Image {activeImageIndex + 1} <span className="mx-2 text-zinc-200">/</span> {product.images.length}
+                            Image {activeImageIndex + 1} <span className="mx-2 text-zinc-200">/</span> {images.length}
                         </div>
                     </motion.div>
                 )}
@@ -91,7 +113,7 @@ export default function ProductDetailPage() {
 
             <div className="mx-auto flex max-w-[1920px] flex-col px-6 md:flex-row md:px-16 lg:gap-20">
 
-                {/* ================= 1. 画廊 (点击触发放大) ================= */}
+                {/* ================= 1. 画廊 2+1+2+1+2... 布局 ================= */}
                 <motion.div
                     initial="hidden"
                     whileInView="visible"
@@ -105,42 +127,48 @@ export default function ProductDetailPage() {
                     }}
                     className="flex-1 space-y-4 md:space-y-6 lg:w-[65%]"
                 >
-                    <div className="grid grid-cols-2 gap-4 md:gap-6">
-                        {product.images.slice(0, 2).map((img, i) => (
-                            <motion.div
-                                key={i}
-                                variants={{ hidden: { opacity: 0, y: 50 }, visible: { opacity: 1, y: 0 } }}
-                                transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}
-                                onClick={() => setActiveImageIndex(i)}
-                                className="group relative aspect-[3/4] cursor-zoom-in overflow-hidden bg-zinc-50"
-                            >
-                                <Image src={img} alt={product.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
-                            </motion.div>
-                        ))}
-                    </div>
-
-                    <motion.div
-                        variants={{ hidden: { opacity: 0, y: 50 }, visible: { opacity: 1, y: 0 } }}
-                        transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}
-                        onClick={() => setActiveImageIndex(2)}
-                        className="group relative aspect-[16/10] cursor-zoom-in overflow-hidden bg-zinc-50 md:aspect-[21/9]"
-                    >
-                        <Image src={product.images[2]} alt={product.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
-                    </motion.div>
-
-                    <div className="grid grid-cols-2 gap-4 md:gap-6">
-                        {product.images.slice(3, 5).map((img, i) => (
-                            <motion.div
-                                key={i + 3}
-                                variants={{ hidden: { opacity: 0, y: 50 }, visible: { opacity: 1, y: 0 } }}
-                                transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}
-                                onClick={() => setActiveImageIndex(i + 3)}
-                                className="group relative aspect-[3/4] cursor-zoom-in overflow-hidden bg-zinc-50"
-                            >
-                                <Image src={img} alt={product.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
-                            </motion.div>
-                        ))}
-                    </div>
+                    {(() => {
+                        const rows: { type: "pair" | "single"; indices: number[] }[] = [];
+                        let i = 0;
+                        let step = 0;
+                        while (i < images.length) {
+                            if (step % 2 === 0) {
+                                rows.push({ type: "pair", indices: [i, i + 1].filter((idx) => idx < images.length) });
+                                i += 2;
+                            } else {
+                                rows.push({ type: "single", indices: [i] });
+                                i += 1;
+                            }
+                            step++;
+                        }
+                        return rows.map((row, rowIdx) =>
+                            row.type === "pair" ? (
+                                <div key={rowIdx} className="grid grid-cols-2 gap-4 md:gap-6">
+                                    {row.indices.map((idx) => (
+                                        <motion.div
+                                            key={idx}
+                                            variants={{ hidden: { opacity: 0, y: 50 }, visible: { opacity: 1, y: 0 } }}
+                                            transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}
+                                            onClick={() => setActiveImageIndex(idx)}
+                                            className="group relative aspect-[3/4] cursor-zoom-in overflow-hidden bg-zinc-50"
+                                        >
+                                            <Image src={images[idx]} alt={product.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" sizes="50vw" />
+                                        </motion.div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <motion.div
+                                    key={rowIdx}
+                                    variants={{ hidden: { opacity: 0, y: 50 }, visible: { opacity: 1, y: 0 } }}
+                                    transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}
+                                    onClick={() => setActiveImageIndex(row.indices[0])}
+                                    className="group relative aspect-[16/10] cursor-zoom-in overflow-hidden bg-zinc-50 md:aspect-[21/9]"
+                                >
+                                    <Image src={images[row.indices[0]]} alt={product.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" sizes="100vw" />
+                                </motion.div>
+                            )
+                        );
+                    })()}
                 </motion.div>
 
                 {/* ================= 2. 右侧信息 (保持 Sticky) ================= */}
@@ -164,7 +192,7 @@ export default function ProductDetailPage() {
                         </div>
 
                         <div className="space-y-3">
-                            <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank"
+                            <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=Hi, I am interested in ${product.name}`} target="_blank"
                                 className="flex h-16 w-full items-center justify-center gap-3 bg-[#25D366] text-[11px] font-black uppercase tracking-[0.2em] text-white hover:bg-[#20ba5a] transition-all"
                             >
                                 <MessageCircle className="size-5" /> Inquire on WhatsApp
@@ -174,7 +202,7 @@ export default function ProductDetailPage() {
                         <div className="space-y-6 pt-6">
                             <p className="text-[13px] leading-relaxed tracking-wide text-zinc-500">{product.description}</p>
                             <ul className="space-y-2">
-                                {product.details.map((d, i) => (
+                                {details.map((d, i) => (
                                     <li key={i} className="flex items-center gap-3 text-[11px] font-medium text-zinc-400">
                                         <div className="size-1 rounded-full bg-zinc-300" /> {d}
                                     </li>

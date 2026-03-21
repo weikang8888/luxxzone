@@ -7,7 +7,6 @@ import WomenSection from "./components/home/WomenSection";
 import MoreAboutUs from "./components/home/MoreAboutUs";
 import WhyChooseUs from "./components/home/WhyChooseUs";
 import Feedback from "./components/home/Feedback";
-import Footer from "./components/Footer";
 
 export default function HomePage() {
   return (
@@ -36,9 +35,6 @@ export default function HomePage() {
 
       {/* 7. 社区与联系 (More About Us) */}
       <MoreAboutUs />
-
-      {/* 极简页脚 */}
-      <Footer />
     </main>
   );
 }

@@ -1,0 +1,336 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronDown, MessageCircle } from "lucide-react";
+import { PLACEHOLDER_IMAGE, WHATSAPP_NUMBER } from "@/lib/constants";
+import { useCategories } from "@/app/hooks/useCategories";
+import { useProductList } from "@/app/hooks/useProductList";
+
+export function nameToSlug(name: string) {
+    return name.toLowerCase().replace(/\s+/g, "-");
+}
+
+const sortOptions: { label: string; value: string; sort_title?: number; sort_best_selling?: number }[] = [
+    { label: "Best Selling", value: "best-selling", sort_best_selling: 1 },
+    { label: "Alphabetical A-Z", value: "alphabetical-a-z", sort_title: 1 },
+    { label: "Alphabetical Z-A", value: "alphabetical-z-a", sort_title: 2 },
+];
+
+type ProductItem = { id: number; name: string; image?: string; badge?: string | null };
+
+type Props = {
+    gender: "men" | "women";
+    slug: string;
+    subSlug?: string;
+};
+
+export default function CategoryContent({ gender, slug, subSlug }: Props) {
+    const searchParams = useSearchParams();
+    const router = useRouter();
+
+    const [isSortOpen, setIsSortOpen] = useState(false);
+    const [currentSort, setCurrentSort] = useState("newest");
+    const [expandedCatIds, setExpandedCatIds] = useState<Set<number>>(new Set());
+    const [collapsedCatIds, setCollapsedCatIds] = useState<Set<number>>(new Set());
+
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || "12", 10);
+
+    const { data: apiCategories = [] } = useCategories();
+
+    useEffect(() => {
+        setCurrentSort(searchParams.get("sort") || "newest");
+    }, [searchParams]);
+
+    const sexDegree = gender === "men" ? 1 : 2;
+    const currentCategory = useMemo(
+        () => apiCategories.find((c) => c.sex_degree === sexDegree && nameToSlug(c.name) === slug),
+        [apiCategories, sexDegree, slug]
+    );
+
+    const subCategory = useMemo(() => {
+        if (!subSlug || !currentCategory) return undefined;
+        return currentCategory.sub_categories.find((s) => nameToSlug(s.name) === subSlug);
+    }, [currentCategory, subSlug]);
+
+    const sub_category_id = subCategory?.id;
+
+    const selectedSort = sortOptions.find((o) => o.value === currentSort);
+    const sortParams: { sort_title?: number; sort_best_selling?: number } = {};
+    if (selectedSort?.sort_title != null) sortParams.sort_title = selectedSort.sort_title;
+    else if (selectedSort?.sort_best_selling != null) sortParams.sort_best_selling = selectedSort.sort_best_selling;
+
+    const { data: products = [], isLoading } = useProductList(currentCategory?.id, sexDegree, {
+        sub_category_id,
+        page,
+        limit,
+        ...sortParams,
+    });
+
+    const sidebarCategories = useMemo(
+        () => apiCategories.filter((c) => c.sex_degree === sexDegree),
+        [apiCategories, sexDegree]
+    );
+
+    const basePath = subSlug ? `/${gender}/${slug}/${subSlug}` : `/${gender}/${slug}`;
+
+    const handleSortSelect = (sortValue: string) => {
+        const p = new URLSearchParams(searchParams.toString());
+        p.set("sort", sortValue);
+        router.push(`${basePath}?${p.toString()}`);
+        setIsSortOpen(false);
+    };
+
+    const toggleSidebarCategory = (catId: number, catSlug: string) => {
+        const isCurrentCategory = slug === catSlug;
+        if (isCurrentCategory) {
+            setCollapsedCatIds((prev) => {
+                const next = new Set(prev);
+                if (next.has(catId)) next.delete(catId);
+                else next.add(catId);
+                return next;
+            });
+        } else {
+            setExpandedCatIds((prev) => {
+                const next = new Set(prev);
+                if (next.has(catId)) next.delete(catId);
+                else next.add(catId);
+                return next;
+            });
+        }
+    };
+
+    const displayTitle = subCategory
+        ? subCategory.name
+        : slug.replace(/-/g, " ");
+
+    const breadcrumb = currentCategory
+        ? `Luxxzone / ${gender} / ${currentCategory.name}`
+        : `Luxxzone / ${gender}`;
+
+    return (
+        <main className="min-h-screen bg-white pb-20 pt-24 md:pt-32 lg:pt-40">
+            <div className="mx-auto flex max-w-[1920px] flex-col gap-10 px-6 md:flex-row md:px-16">
+
+                {/* --- 1. Sidebar --- */}
+                <aside className="hidden w-64 shrink-0 md:block">
+                    <div className="sticky top-40">
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.8, ease: "easeOut", staggerChildren: 0.05 }}
+                            className="mb-12"
+                        >
+                            <h2 className="mb-8 text-[10px] font-black uppercase tracking-[0.4em] text-zinc-300">Navigation</h2>
+                            <nav className="flex flex-col space-y-7">
+                                {sidebarCategories.map((cat) => {
+                                    const catSlug = nameToSlug(cat.name);
+                                    const hasSubs = cat.sub_categories.length > 0;
+                                    const isCurrentCategory = slug === catSlug;
+                                    const isExpanded = isCurrentCategory
+                                        ? !collapsedCatIds.has(cat.id)
+                                        : expandedCatIds.has(cat.id);
+                                    const baseHref = `/${gender}/${catSlug}`;
+                                    return (
+                                        <div key={cat.id} className="flex flex-col">
+                                            <div className="flex items-center justify-between gap-2">
+                                                <Link
+                                                    href={baseHref}
+                                                    className={`text-[11px] font-black uppercase tracking-widest transition-all ${slug === catSlug ? "text-black" : "text-zinc-400 hover:text-black"}`}
+                                                >
+                                                    {cat.name}
+                                                </Link>
+                                                {hasSubs && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            toggleSidebarCategory(cat.id, catSlug);
+                                                        }}
+                                                        className="-m-1.5 flex shrink-0 cursor-pointer p-1.5 text-zinc-400 transition-colors hover:text-black"
+                                                        aria-expanded={isExpanded}
+                                                        aria-label={isExpanded ? "Collapse subcategories" : "Expand subcategories"}
+                                                    >
+                                                        <motion.span
+                                                            animate={{ rotate: isExpanded ? 180 : 0 }}
+                                                            transition={{ duration: 0.25, ease: "easeInOut" }}
+                                                            className="block"
+                                                        >
+                                                            <ChevronDown className="size-4" />
+                                                        </motion.span>
+                                                    </button>
+                                                )}
+                                            </div>
+                                            <AnimatePresence initial={false}>
+                                                {hasSubs && isExpanded && (
+                                                    <motion.div
+                                                        key={`sub-${cat.id}`}
+                                                        initial={{ height: 0, opacity: 0 }}
+                                                        animate={{ height: "auto", opacity: 1 }}
+                                                        exit={{ height: 0, opacity: 0 }}
+                                                        transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+                                                        className="overflow-hidden"
+                                                    >
+                                                        <motion.div
+                                                            className="mt-6 flex flex-col space-y-4 border-l border-zinc-100 pl-4"
+                                                            initial="hidden"
+                                                            animate="visible"
+                                                            variants={{
+                                                                hidden: {},
+                                                                visible: {
+                                                                    transition: { staggerChildren: 0.04, delayChildren: 0.08 },
+                                                                },
+                                                            }}
+                                                        >
+                                                            <motion.div variants={{ hidden: { opacity: 0, x: -8 }, visible: { opacity: 1, x: 0 } }}>
+                                                                <Link
+                                                                    href={baseHref}
+                                                                    className={`text-[9px] font-bold uppercase tracking-widest ${slug === catSlug && !subSlug ? "text-black" : "text-zinc-400 hover:text-black"}`}
+                                                                >
+                                                                    Shop All
+                                                                </Link>
+                                                            </motion.div>
+                                                            {cat.sub_categories.map((sub) => {
+                                                                const subHref = `/${gender}/${catSlug}/${nameToSlug(sub.name)}`;
+                                                                const isActive = slug === catSlug && sub_category_id === sub.id;
+                                                                return (
+                                                                    <motion.div key={sub.id} variants={{ hidden: { opacity: 0, x: -8 }, visible: { opacity: 1, x: 0 } }}>
+                                                                        <Link
+                                                                            href={subHref}
+                                                                            className={`text-[9px] font-bold uppercase tracking-widest ${isActive ? "text-black" : "text-zinc-400 hover:text-black"}`}
+                                                                        >
+                                                                            {sub.name}
+                                                                        </Link>
+                                                                    </motion.div>
+                                                                );
+                                                            })}
+                                                        </motion.div>
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+                                        </div>
+                                    );
+                                })}
+                            </nav>
+                        </motion.div>
+                    </div>
+                </aside>
+
+                {/* --- 2. Main Content --- */}
+                <section className="flex-1 min-w-0">
+                    <div className="mb-12 flex flex-col border-b border-zinc-100 pb-10">
+                        <div className="mb-8">
+                            <span className="mb-4 block text-[10px] font-bold uppercase tracking-[0.5em] text-zinc-300">{breadcrumb}</span>
+                            <h1 className="text-5xl font-black uppercase leading-none tracking-tighter md:text-8xl">{displayTitle}</h1>
+                        </div>
+
+                        <div className="flex items-end justify-between md:items-center">
+                            <p className="text-[11px] font-black uppercase tracking-widest text-zinc-400">
+                                Total: {products.length} <span className="hidden sm:inline">Items</span>
+                            </p>
+
+                            <div className="relative">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsSortOpen(!isSortOpen)}
+                                    className="flex items-center gap-2 border-b-2 border-black pb-1 text-[10px] font-black uppercase tracking-widest"
+                                >
+                                    Sort: {sortOptions.find(o => o.value === currentSort)?.label}
+                                    <ChevronDown className={`size-3 transition-transform ${isSortOpen ? 'rotate-180' : ''}`} />
+                                </button>
+                                {isSortOpen && (
+                                    <div className="absolute right-0 top-full z-50 mt-4 w-56 bg-white p-6 shadow-2xl ring-1 ring-black/5 animate-in fade-in slide-in-from-top-2 duration-300">
+                                        <div className="flex flex-col gap-4 text-right">
+                                            {sortOptions.map((o) => (
+                                                <button
+                                                    key={o.value}
+                                                    onClick={() => handleSortSelect(o.value)}
+                                                    className={`text-[9px] font-bold uppercase tracking-widest ${currentSort === o.value ? "text-black" : "text-zinc-400 hover:text-black"}`}
+                                                >
+                                                    {o.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {isLoading ? (
+                        <div className="grid grid-cols-2 gap-x-6 gap-y-16 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-10">
+                            {[...Array(8)].map((_, i) => (
+                                <div key={i} className="aspect-3/4 animate-pulse bg-zinc-100" />
+                            ))}
+                        </div>
+                    ) : (
+                        <motion.div
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true, amount: 0.1 }}
+                            variants={{
+                                hidden: { opacity: 0 },
+                                visible: {
+                                    opacity: 1,
+                                    transition: { staggerChildren: 0.1, delayChildren: 0 },
+                                },
+                            }}
+                            className="grid grid-cols-2 gap-x-6 gap-y-16 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-10"
+                        >
+                            {(products as ProductItem[]).map((p) => (
+                                <motion.div
+                                    key={p.id}
+                                    variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } }}
+                                    transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+                                    className="group flex flex-col"
+                                >
+                                    <div className="relative aspect-[3/4] overflow-hidden bg-zinc-50 mb-6 transition-transform duration-500 hover:shadow-xl">
+                                        <Link href={`/product/${p.id}`}>
+                                            <Image
+                                                src={p.image ?? PLACEHOLDER_IMAGE}
+                                                alt={p.name}
+                                                fill
+                                                className="object-cover transition-transform duration-[1.5s] ease-out md:group-hover:scale-105"
+                                                sizes="(max-width: 768px) 50vw, 25vw"
+                                            />
+                                        </Link>
+                                        {p.badge && (
+                                            <span className="absolute left-0 top-4 bg-black px-2 py-1 text-[8px] font-black uppercase tracking-widest text-white">
+                                                {p.badge}
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    <div className="mb-5 px-1">
+                                        <h3 className="text-[10px] font-black uppercase tracking-widest mb-1 truncate text-zinc-950">
+                                            {p.name}
+                                        </h3>
+                                        <p className="text-[9px] font-medium tracking-[0.2em] text-zinc-400 italic">
+                                            Seasonal Edition
+                                        </p>
+                                    </div>
+
+                                    <div className="mt-auto">
+                                        <a
+                                            href={`https://wa.me/${WHATSAPP_NUMBER}?text=Hi, I am interested in ${p.name}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex w-full items-center justify-center gap-3 bg-[#25D366] py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white transition-all active:scale-95 hover:bg-[#20ba5a] shadow-sm"
+                                        >
+                                            <MessageCircle className="size-4" />
+                                            <span>INQUIRE NOW</span>
+                                        </a>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </motion.div>
+                    )}
+                </section>
+            </div>
+        </main>
+    );
+}

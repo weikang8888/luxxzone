@@ -1,5 +1,7 @@
 export const WHATSAPP_NUMBER = "6581234567";
 
+export const PLACEHOLDER_IMAGE = "/fallback.jpg";
+
 // 品牌列表 - 与 category 页 filter 及 Header mobile dropdown 共用
 export const clothingBrandOptions = [
     "Shop All",

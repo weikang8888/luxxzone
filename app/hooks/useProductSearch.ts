@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { showProductList } from "@/app/api/api";
+import { searchProducts } from "@/app/api/api";
 import { PLACEHOLDER_IMAGE } from "@/lib/constants";
 
 const DEFAULT_PAGE = 1;
@@ -13,31 +13,25 @@ function getProductImage(p: Record<string, unknown>): string {
     return (fromList ?? fromField ?? PLACEHOLDER_IMAGE) as string;
 }
 
-export function useProductList(
-    category_id: number | undefined,
-    sex_degree: number,
-    options?: { sub_category_id?: number; page?: number; limit?: number }
-) {
+export function useProductSearch(keyword: string, sex_degree: number, options?: { page?: number; limit?: number }) {
     const page = options?.page ?? DEFAULT_PAGE;
     const limit = options?.limit ?? DEFAULT_LIMIT;
+    const trimmed = keyword.trim();
 
     return useQuery({
-        queryKey: ["products", category_id, sex_degree, options?.sub_category_id ?? null, page, limit],
+        queryKey: ["products", "search", trimmed, sex_degree, page, limit],
         queryFn: async () => {
-            if (category_id == null) return [];
-            const res = await showProductList(category_id, sex_degree, {
-                sub_category_id: options?.sub_category_id,
-                page,
-                limit,
-            });
+            if (!trimmed) return { data: [], pagination: null };
+            const res = await searchProducts(trimmed, sex_degree, { page, limit });
             const raw = res?.data?.data ?? (Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : []);
-            return raw.map((p: Record<string, unknown>) => ({
+            const data = raw.map((p: Record<string, unknown>) => ({
                 id: p.id,
                 name: p.title ?? p.name ?? "",
                 image: getProductImage(p),
                 badge: p.best_selling_tag ? "Best Selling" : p.new_tag ? "New" : p.badge ?? null,
             }));
+            return { data, pagination: res?.data?.pagination ?? null };
         },
-        enabled: category_id != null,
+        enabled: trimmed.length > 0,
     });
 }

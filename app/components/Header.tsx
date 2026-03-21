@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, Search, X } from "lucide-react";
+import { ArrowRight, Menu, Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import MobileMenu from "./MobileMenu";
 import { useCategories } from "@/app/hooks/useCategories";
+import { useProductSearch } from "@/app/hooks/useProductSearch";
+import { PLACEHOLDER_IMAGE } from "@/lib/constants";
 
 type ApiCategory = { id: number; name: string; sex_degree: number; sub_categories: { id: number; name: string }[] };
 type NavCategory = { id: number; label: string; slug: string; sub_categories: { id: number; label: string; href: string }[] };
@@ -24,7 +26,7 @@ function apiToNavCategories(data: ApiCategory[], sexDegree: number, gender: "men
             const sub_categories = c.sub_categories.map((sub) => ({
                 id: sub.id,
                 label: sub.name,
-                href: `/${gender}/${slug}?sub=${sub.id}`,
+                href: `/${gender}/${slug}/${nameToSlug(sub.name)}`,
             }));
             if (sub_categories.length > 0) {
                 sub_categories.unshift({ id: 0, label: "Shop All", href: baseHref });
@@ -54,6 +56,19 @@ export default function Header() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [searchKeyword, setSearchKeyword] = useState("");
+    const [debouncedKeyword, setDebouncedKeyword] = useState("");
+
+    const { data: searchResult, isLoading: isSearching } = useProductSearch(debouncedKeyword, sexDegree);
+
+    useEffect(() => {
+        if (!searchKeyword.trim()) {
+            setDebouncedKeyword("");
+            return;
+        }
+        const t = setTimeout(() => setDebouncedKeyword(searchKeyword.trim()), 300);
+        return () => clearTimeout(t);
+    }, [searchKeyword]);
 
     // 1. 滾動監聽
     useEffect(() => {
@@ -75,16 +90,17 @@ export default function Header() {
     const handleGenderSwitch = (gender: "men" | "women") => {
         setActiveGender(gender);
         if (!categorySlug) return;
-        const currentSub = searchParams.get("sub");
+        const subSlug = typeof params.subSlug === "string" ? params.subSlug : "";
         const sexDegree = gender === "men" ? 1 : 2;
         const mainCat = apiCategories.find((c) => c.sex_degree === (activeGender === "men" ? 1 : 2) && nameToSlug(c.name) === categorySlug);
-        const subCat = mainCat?.sub_categories.find((s) => String(s.id) === currentSub);
+        const currentSub = mainCat?.sub_categories.find((s) => nameToSlug(s.name) === subSlug);
         const targetParent = apiCategories.find((c) => c.sex_degree === sexDegree && nameToSlug(c.name) === categorySlug);
         if (targetParent) {
-            const subParam = subCat && targetParent.sub_categories.length > 0
-                ? `?sub=${targetParent.sub_categories.find((s) => s.name === subCat.name)?.id ?? ""}`
-                : "";
-            router.push(`/${gender}/${categorySlug}${subParam}`);
+            const targetSub = currentSub && targetParent.sub_categories.find((s) => s.name === currentSub.name);
+            const path = targetSub
+                ? `/${gender}/${categorySlug}/${nameToSlug(targetSub.name)}`
+                : `/${gender}/${categorySlug}`;
+            router.push(path);
         }
     };
 
@@ -100,33 +116,102 @@ export default function Header() {
                 categories={categories}
             />
 
-            {/* --- 2. Search Overlay --- */}
+            {/* --- 2. Search Overlay (极速响应版) --- */}
             <div
-                className={`absolute inset-0 z-[120] flex items-center transition-all duration-700 ease-expo ${isSearchOpen ? "translate-y-0" : "-translate-y-full"
-                    } ${isScrolled ? "bg-zinc-950 text-white" : "bg-white text-black"}`}
+                className={`fixed inset-0 z-[120] flex flex-col transition-all ${isSearchOpen ? "translate-y-0 opacity-100 visible" : "-translate-y-full opacity-0 invisible"
+                    }`}
             >
-                <div className="mx-auto flex w-full max-w-[1400px] items-center px-8">
-                    {/* 调整图标颜色：滚动后使用白色透明度 */}
-                    <Search className={`size-8 transition-opacity ${isScrolled ? "text-white opacity-30" : "text-black opacity-20"}`} />
+                {/* 1. 顶部输入区域：始终遮挡 Header */}
+                <div className={`relative z-10 transition-colors duration-300 ${isScrolled ? "bg-zinc-950 text-white" : "bg-white text-black"}`}>
+                    <div className={`mx-auto flex w-full max-w-[1400px] items-center px-6 lg:px-8 shrink-0 border-b ${isScrolled ? "border-zinc-800" : "border-zinc-100"}`}>
+                        <Search className={`size-5 lg:size-8 shrink-0 transition-opacity ${isScrolled ? "text-white opacity-40" : "text-black opacity-20"}`} />
+                        <input
+                            type="text"
+                            placeholder="SEARCH ARCHIVE..."
+                            value={searchKeyword}
+                            onChange={(e) => setSearchKeyword(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" && searchKeyword.trim()) {
+                                    router.push(`/search?q=${encodeURIComponent(searchKeyword.trim())}&gender=${activeGender}`);
+                                    setIsSearchOpen(false);
+                                }
+                            }}
+                            // 🌟 字号与间距优化
+                            className={`w-full bg-transparent px-4 py-8 text-2xl font-black uppercase tracking-tighter outline-none md:px-8 md:py-12 md:text-6xl transition-all ${isScrolled ? "text-white placeholder:text-zinc-800" : "text-black placeholder:text-zinc-200"
+                                }`}
+                            autoFocus={isSearchOpen}
+                        />
+                        <button onClick={() => { setIsSearchOpen(false); setSearchKeyword(""); setDebouncedKeyword(""); }} className="p-2 transition-transform active:scale-90">
+                            <X className="size-6 lg:size-8" />
+                        </button>
+                    </div>
+                </div>
 
-                    <input
-                        type="text"
-                        placeholder="SEARCH THE ARCHIVE..."
-                        // 🌟 核心修改点：根据 isScrolled 切换文字颜色和 Placeholder 颜色
-                        className={`w-full bg-transparent px-8 py-12 text-3xl font-black uppercase tracking-tighter outline-none md:text-6xl transition-colors duration-500 ${isScrolled
-                            ? "text-white placeholder:text-zinc-600"
-                            : "text-black placeholder:text-zinc-300"
-                            }`}
-                        autoFocus={isSearchOpen}
-                    />
+                {/* 🌟 2. 结果区域：极速显现逻辑 */}
+                <div
+                    className={`flex-1 overflow-y-auto transition-colors duration-300 ${debouncedKeyword
+                        ? (isScrolled ? "bg-zinc-950" : "bg-white")
+                        : "bg-transparent pointer-events-none"
+                        }`}
+                >
+                    {debouncedKeyword && (
+                        <div className={`mx-auto w-full max-w-[1400px] flex flex-col md:flex-row gap-10 md:gap-20 px-6 lg:px-8 py-8 md:py-12 animate-in fade-in duration-300 ${isScrolled ? "text-white" : "text-black"}`}>
 
-                    {/* 关闭按钮部分，图标已经在 div 层级通过 text-white 自动适配了，这里确保文字颜色一致 */}
-                    <button onClick={() => setIsSearchOpen(false)} className="flex flex-col items-center gap-1 group">
-                        <X className="size-8 transition-transform group-hover:rotate-90" />
-                        <span className={`text-[10px] font-bold tracking-widest ${isScrolled ? "text-zinc-500" : "text-zinc-400"}`}>
-                            ESC
-                        </span>
-                    </button>
+                            {/* 左侧：分类匹配 */}
+                            <div className="w-full md:w-80 shrink-0 space-y-10">
+                                <div className="space-y-6">
+                                    <p className={`text-[9px] font-black uppercase tracking-[0.5em] italic ${isScrolled ? "text-zinc-700" : "text-zinc-300"}`}>Categories</p>
+                                    <div className="flex flex-col gap-4">
+                                        {categories
+                                            .filter(c => c.label.toLowerCase().includes(debouncedKeyword.toLowerCase()))
+                                            .map(cat => (
+                                                <Link key={cat.id} href={`/${activeGender}/${cat.slug}`} onClick={() => setIsSearchOpen(false)}
+                                                    className="text-2xl font-black uppercase tracking-tighter hover:italic transition-all leading-none">
+                                                    {cat.label}
+                                                </Link>
+                                            ))}
+                                    </div>
+                                </div>
+
+                                {/* 子分类匹配 */}
+                                <div className="space-y-6">
+                                    <p className={`text-[9px] font-black uppercase tracking-[0.5em] italic ${isScrolled ? "text-zinc-700" : "text-zinc-300"}`}>Sub-categories</p>
+                                    <div className="flex flex-wrap md:flex-col gap-2 md:gap-4">
+                                        {categories.flatMap(c => c.sub_categories)
+                                            .filter(s => s.label.toLowerCase().includes(debouncedKeyword.toLowerCase()) && s.label !== "Shop All")
+                                            .slice(0, 8)
+                                            .map(sub => (
+                                                <Link key={sub.id} href={sub.href} onClick={() => setIsSearchOpen(false)}
+                                                    className={`text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] border px-3 py-1.5 md:border-none md:p-0 transition-colors ${isScrolled ? "border-zinc-800 text-zinc-500 hover:text-white" : "border-zinc-100 text-zinc-400 hover:text-black"
+                                                        }`}>
+                                                    {sub.label}
+                                                </Link>
+                                            ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* 右侧：产品网格 */}
+                            <div className="flex-1 pb-32">
+                                <p className={`mb-8 text-[9px] font-black uppercase tracking-[0.5em] italic ${isScrolled ? "text-zinc-700" : "text-zinc-300"}`}>Products</p>
+
+                                {searchResult?.data?.length ? (
+                                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-x-4 gap-y-10 md:gap-x-8 md:gap-y-12">
+                                        {searchResult.data.map((p: any) => (
+                                            <Link key={p.id} href={`/product/${p.id}`} onClick={() => { setIsSearchOpen(false); setSearchKeyword(""); }} className="group block">
+                                                <div className={`relative aspect-[3/4] overflow-hidden mb-4 ${isScrolled ? "bg-zinc-900 shadow-2xl" : "bg-zinc-50 shadow-lg"}`}>
+                                                    <Image src={p.image ?? PLACEHOLDER_IMAGE} alt={p.name} fill className="object-cover transition-all duration-500 group-hover:scale-105" />
+                                                </div>
+                                                <h4 className="truncate text-[10px] font-bold uppercase tracking-widest leading-tight opacity-80">{p.name}</h4>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="py-20 text-center md:text-left opacity-20 font-black text-2xl uppercase tracking-tighter italic">No Archive</div>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 

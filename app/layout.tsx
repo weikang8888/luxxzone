@@ -5,6 +5,7 @@ import "./globals.css";
 import SmoothScroll from "./components/SmoothScroll";
 import LoadingScreen from "./components/LoadingScreen";
 import Header from "./components/Header";
+import Footer from "./components/Footer";
 import QueryProvider from "./providers/QueryProvider";
 
 // 奢侈品电商常用的字体组合：Inter 负责正文的可读性，Archivo 负责标题的力量感
@@ -47,6 +48,7 @@ export default function RootLayout({
           </Suspense>
           <div className="relative flex min-h-screen flex-col">
             {children}
+            <Footer />
           </div>
         </SmoothScroll>
         </QueryProvider>
