@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -7,7 +8,7 @@ import { MessageCircle } from "lucide-react";
 import { PLACEHOLDER_IMAGE, WHATSAPP_NUMBER } from "@/lib/constants";
 import { useProductSearch } from "@/app/hooks/useProductSearch";
 
-export default function SearchPage() {
+function SearchContent() {
     const searchParams = useSearchParams();
     const q = searchParams.get("q") ?? "";
     const genderParam = searchParams.get("gender");
@@ -98,5 +99,24 @@ export default function SearchPage() {
                 )}
             </div>
         </main>
+    );
+}
+
+export default function SearchPage() {
+    return (
+        <Suspense fallback={
+            <main className="min-h-screen bg-white pb-20 pt-24 md:pt-40">
+                <div className="mx-auto max-w-[1920px] px-6 md:px-16">
+                    <div className="h-12 animate-pulse bg-zinc-100 w-48 mb-8" />
+                    <div className="grid grid-cols-2 gap-x-6 gap-y-16 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-10">
+                        {[...Array(8)].map((_, i) => (
+                            <div key={i} className="aspect-3/4 animate-pulse bg-zinc-100" />
+                        ))}
+                    </div>
+                </div>
+            </main>
+        }>
+            <SearchContent />
+        </Suspense>
     );
 }
