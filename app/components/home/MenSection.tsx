@@ -6,10 +6,10 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 
 const categories = [
-    { id: 1, name: "Outerwear", image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=800" },
-    { id: 2, name: "Tops", image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=800" },
-    { id: 3, name: "Shirts", image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=800" },
-    { id: 4, name: "Trousers", image: "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?q=80&w=800" },
+    { id: 1, name: "New Arrival", slug: "new-arrival", image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=800" },
+    { id: 2, name: "Clothing", slug: "clothing", image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=800" },
+    { id: 3, name: "Shoes", slug: "shoes", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800" },
+    { id: 4, name: "Bags", slug: "bags", image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?q=80&w=800" },
 ];
 
 const fadeInUp = {
@@ -97,7 +97,7 @@ export default function MenSection() {
                         >
                             {categories.map((category) => (
                                 <motion.div key={category.id} variants={staggerItem} transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}>
-                                    <Link href="/men/clothing" className="group block">
+                                    <Link href={`/men/${category.slug}`} className="group block">
                                         <div className="relative aspect-[3/4] overflow-hidden bg-zinc-100">
                                             <Image src={category.image} alt={category.name} fill className="object-cover transition-transform duration-1000 ease-out group-hover:scale-110" />
                                             <div className="absolute inset-0 bg-black/0 transition-colors duration-500 group-hover:bg-black/10" />

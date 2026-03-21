@@ -4,29 +4,34 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+
 const categories = [
     {
         id: 1,
-        name: "Dresses",
-        image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=800&auto=format&fit=crop",
+        name: "New Arrival",
+        slug: "new-arrival",
+        image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=800&auto=format&fit=crop",
         gridClass: "md:col-span-2 md:row-span-2",
     },
     {
         id: 2,
-        name: "Knitwear",
-        image: "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?q=80&w=800&auto=format&fit=crop",
+        name: "Clothing",
+        slug: "clothing",
+        image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=800&auto=format&fit=crop",
         gridClass: "md:col-span-1 md:row-span-2",
     },
     {
         id: 3,
-        name: "Trousers",
-        image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=80&w=800&auto=format&fit=crop",
+        name: "Shoes",
+        slug: "shoes",
+        image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=800&auto=format&fit=crop",
         gridClass: "md:col-span-1 md:row-span-1",
     },
     {
         id: 4,
-        name: "Outerwear",
-        image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=800&auto=format&fit=crop",
+        name: "Bags",
+        slug: "bags",
+        image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?q=80&w=800&auto=format&fit=crop",
         gridClass: "md:col-span-1 md:row-span-1",
     },
 ];
@@ -112,7 +117,7 @@ export default function WomenSection() {
                             className={`group relative flex flex-col overflow-hidden ${category.gridClass}`}
                         >
                             <Link
-                                href="/women/clothing"
+                                href={`/women/${category.slug}`}
                                 className="flex h-full min-h-0 flex-col"
                             >
                                 <div className="relative min-h-[180px] flex-1 overflow-hidden bg-zinc-100 md:min-h-[200px]">

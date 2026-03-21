@@ -7,44 +7,27 @@ import { motion } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectCoverflow } from "swiper/modules";
 import { Badge } from "../Badge";
+import { useFeaturedProducts } from "@/app/hooks/useFeaturedProducts";
+import { PLACEHOLDER_IMAGE } from "@/lib/constants";
 import "swiper/css";
 import "swiper/css/effect-coverflow";
 
 const MOBILE_BREAKPOINT = 1024;
 
-const products = [
-    {
-        id: 1,
-        name: "Oversized Wool Coat",
-        image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=800&auto=format&fit=crop",
-        badge: "New",
-    },
-    {
-        id: 2,
-        name: "Structured Blazer",
-        image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=800&auto=format&fit=crop",
-        badge: null,
-    },
-    {
-        id: 3,
-        name: "Wide-Leg Trousers",
-        image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=80&w=800&auto=format&fit=crop",
-        badge: "Best Seller",
-    },
-];
+type ProductItem = { id: number; name: string; image: string; badge: string | null };
 
 function ProductCard({
     product,
     showHoverAsActive,
 }: {
-    product: (typeof products)[0];
+    product: ProductItem;
     showHoverAsActive?: boolean;
 }) {
     return (
         <div className="group relative flex flex-col bg-zinc-950">
             <div className="relative aspect-[3/4] overflow-hidden">
                 <Image
-                    src={product.image}
+                    src={product.image ?? PLACEHOLDER_IMAGE}
                     alt={product.name}
                     fill
                     sizes="(max-width: 1024px) 85vw, 33vw"
@@ -100,6 +83,7 @@ const staggerItem = {
 
 export default function FeaturedProducts() {
     const [isMobile, setIsMobile] = useState(false);
+    const { data: products = [], isLoading } = useFeaturedProducts(3);
 
     useEffect(() => {
         const mq = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
@@ -135,7 +119,17 @@ export default function FeaturedProducts() {
             </div>
 
             {/* Mobile: 直接渲染 Swiper，避免 motion opacity 导致不显示 */}
-            {isMobile ? (
+            {isLoading ? (
+                <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-8 md:grid-cols-3 md:gap-12">
+                    {[...Array(3)].map((_, i) => (
+                        <div key={i} className="aspect-[3/4] animate-pulse bg-zinc-800" />
+                    ))}
+                </div>
+            ) : products.length === 0 ? (
+                <div className="mx-auto max-w-[1400px] py-16 text-center text-zinc-500">
+                    No featured products yet.
+                </div>
+            ) : isMobile ? (
                 <div className="mx-auto max-w-[1400px] overflow-x-clip">
                     <Swiper
                         effect="coverflow"
@@ -154,13 +148,16 @@ export default function FeaturedProducts() {
                         }}
                         className="!overflow-visible"
                     >
-                        {products.map((product) => (
-                            <SwiperSlide key={product.id} className="!w-[85vw] sm:!w-[70vw]">
-                                {({ isActive }: { isActive: boolean }) => (
-                                    <ProductCard product={product} showHoverAsActive={isActive} />
-                                )}
-                            </SwiperSlide>
-                        ))}
+                        {(products as ProductItem[]).map((product, index) => {
+                            const badge = index === 0 || index === 1 ? "New" : index === 2 ? "Best Selling" : product.badge;
+                            return (
+                                <SwiperSlide key={product.id} className="!w-[85vw] sm:!w-[70vw]">
+                                    {({ isActive }: { isActive: boolean }) => (
+                                        <ProductCard product={{ ...product, badge }} showHoverAsActive={isActive} />
+                                    )}
+                                </SwiperSlide>
+                            );
+                        })}
                     </Swiper>
                 </div>
             ) : (
@@ -171,17 +168,20 @@ export default function FeaturedProducts() {
                     variants={staggerContainer}
                     className="mx-auto grid max-w-[1400px] grid-cols-1 gap-8 md:grid-cols-3 md:gap-12"
                 >
-                    {products.map((product) => (
-                        <motion.div key={product.id} variants={staggerItem} transition={{ duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] }}>
-                            <ProductCard product={product} />
-                        </motion.div>
-                    ))}
+                    {(products as ProductItem[]).map((product, index) => {
+                        const badge = index === 0 || index === 1 ? "New" : index === 2 ? "Best Selling" : product.badge;
+                        return (
+                            <motion.div key={product.id} variants={staggerItem} transition={{ duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] }}>
+                                <ProductCard product={{ ...product, badge }} />
+                            </motion.div>
+                        );
+                    })}
                 </motion.div>
             )}
 
             <div className="mt-20 flex justify-center">
                 <Link
-                    href="/women/new-arrivals"
+                    href="/women/new-arrival"
                     className="inline-flex rounded-none border border-zinc-700 px-12 py-7 text-[11px] font-bold uppercase tracking-widest text-white transition-all duration-500 hover:bg-white hover:text-black"
                 >
                     View Full Collection

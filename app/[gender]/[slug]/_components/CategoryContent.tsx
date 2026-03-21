@@ -3,12 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, MessageCircle } from "lucide-react";
 import { PLACEHOLDER_IMAGE, WHATSAPP_NUMBER } from "@/lib/constants";
 import { useCategories } from "@/app/hooks/useCategories";
-import { useProductList } from "@/app/hooks/useProductList";
+import { useProductListInfinite } from "@/app/hooks/useProductListInfinite";
 
 export function nameToSlug(name: string) {
     return name.toLowerCase().replace(/\s+/g, "-");
@@ -33,17 +33,17 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
     const router = useRouter();
 
     const [isSortOpen, setIsSortOpen] = useState(false);
-    const [currentSort, setCurrentSort] = useState("newest");
+    const [currentSort, setCurrentSort] = useState("best-selling");
     const [expandedCatIds, setExpandedCatIds] = useState<Set<number>>(new Set());
     const [collapsedCatIds, setCollapsedCatIds] = useState<Set<number>>(new Set());
 
-    const page = parseInt(searchParams.get("page") || "1", 10);
-    const limit = parseInt(searchParams.get("limit") || "12", 10);
+    const limit = 12;
+    const loadMoreRef = useRef<HTMLDivElement>(null);
 
     const { data: apiCategories = [] } = useCategories();
 
     useEffect(() => {
-        setCurrentSort(searchParams.get("sort") || "newest");
+        setCurrentSort(searchParams.get("sort") || "best-selling");
     }, [searchParams]);
 
     const sexDegree = gender === "men" ? 1 : 2;
@@ -64,12 +64,19 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
     if (selectedSort?.sort_title != null) sortParams.sort_title = selectedSort.sort_title;
     else if (selectedSort?.sort_best_selling != null) sortParams.sort_best_selling = selectedSort.sort_best_selling;
 
-    const { data: products = [], isLoading } = useProductList(currentCategory?.id, sexDegree, {
+    const {
+        data,
+        isLoading,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+    } = useProductListInfinite(currentCategory?.id, sexDegree, {
         sub_category_id,
-        page,
         limit,
         ...sortParams,
     });
+
+    const products = useMemo(() => data?.pages.flatMap((p) => p.products) ?? [], [data]);
 
     const sidebarCategories = useMemo(
         () => apiCategories.filter((c) => c.sex_degree === sexDegree),
@@ -77,6 +84,20 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
     );
 
     const basePath = subSlug ? `/${gender}/${slug}/${subSlug}` : `/${gender}/${slug}`;
+
+    useEffect(() => {
+        if (!hasNextPage || isFetchingNextPage) return;
+        const el = loadMoreRef.current;
+        if (!el) return;
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0]?.isIntersecting) fetchNextPage();
+            },
+            { rootMargin: "200px", threshold: 0 }
+        );
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
     const handleSortSelect = (sortValue: string) => {
         const p = new URLSearchParams(searchParams.toString());
@@ -270,13 +291,12 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
                     ) : (
                         <motion.div
                             initial="hidden"
-                            whileInView="visible"
-                            viewport={{ once: true, amount: 0.1 }}
+                            animate="visible"
                             variants={{
                                 hidden: { opacity: 0 },
                                 visible: {
                                     opacity: 1,
-                                    transition: { staggerChildren: 0.1, delayChildren: 0 },
+                                    transition: { staggerChildren: 0.08, delayChildren: 0.05 },
                                 },
                             }}
                             className="grid grid-cols-2 gap-x-6 gap-y-16 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-10"
@@ -284,8 +304,8 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
                             {(products as ProductItem[]).map((p) => (
                                 <motion.div
                                     key={p.id}
-                                    variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } }}
-                                    transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+                                    variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } }}
+                                    transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
                                     className="group flex flex-col"
                                 >
                                     <div className="relative aspect-[3/4] overflow-hidden bg-zinc-50 mb-6 transition-transform duration-500 hover:shadow-xl">
@@ -328,6 +348,18 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
                                 </motion.div>
                             ))}
                         </motion.div>
+                    )}
+
+                    {hasNextPage && (
+                        <div ref={loadMoreRef} className="min-h-[120px] py-12">
+                            {isFetchingNextPage && (
+                                <div className="grid grid-cols-2 gap-x-6 gap-y-16 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-10">
+                                    {[...Array(4)].map((_, i) => (
+                                        <div key={i} className="aspect-[3/4] animate-pulse bg-zinc-100" />
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     )}
                 </section>
             </div>

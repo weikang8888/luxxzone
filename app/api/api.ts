@@ -26,6 +26,16 @@ export async function searchProducts(keyword: string, sex_degree: number, option
   return data;
 }
 
+export async function getNewestProduct() {
+  const { data } = await axios.get(`${API_BASE_URL}/products`, { params: { sort_new: 1 } });
+  return data;
+}
+
+export async function getBestSellerProduct() {
+  const { data } = await axios.get(`${API_BASE_URL}/products`, { params: { sort_best_selling: 1 } });
+  return data;
+}
+
 export async function getCategories() {
   const { data } = await axios.get(`${API_BASE_URL}/categories`);
   return data;
