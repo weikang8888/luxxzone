@@ -41,7 +41,7 @@ export default function MobileMenu({ isOpen, onClose, activeGender, onGenderSwit
                 duration: isOpen ? 0.6 : 0.5,
                 ease: isOpen ? [0.16, 1, 0.3, 1] : [0.4, 0, 1, 1],
             }}
-            className="fixed inset-0 z-[110] flex flex-col bg-white md:hidden"
+            className="fixed inset-0 z-110 flex flex-col bg-white md:hidden"
         >
             {/* Header */}
             <div className="flex items-center justify-between px-8 py-8 shrink-0">

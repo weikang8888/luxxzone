@@ -27,7 +27,7 @@ export default function ProductDetailPage() {
             <main className="min-h-screen bg-white pb-20 pt-24 md:pt-40">
                 <div className="mx-auto flex max-w-[1920px] flex-col gap-10 px-6 md:flex-row md:px-16">
                     <div className="flex-1 space-y-4">
-                        <div className="aspect-[3/4] animate-pulse bg-zinc-100" />
+                        <div className="aspect-3/4 animate-pulse bg-zinc-100" />
                     </div>
                     <aside className="w-full md:w-[35%]">
                         <div className="h-96 animate-pulse bg-zinc-100" />
@@ -63,12 +63,12 @@ export default function ProductDetailPage() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[200] flex items-center justify-center bg-white/98 backdrop-blur-sm"
+                        className="fixed inset-0 z-200 flex items-center justify-center bg-white/98 backdrop-blur-sm"
                     >
                         {/* 關閉按鈕 */}
                         <button
                             onClick={() => setActiveImageIndex(null)}
-                            className="absolute right-10 top-10 z-[210] group p-4"
+                            className="absolute right-10 top-10 z-210 group p-4"
                         >
                             <X className="size-8 transition-transform duration-300 group-hover:rotate-90 group-active:scale-90" />
                         </button>
@@ -150,7 +150,7 @@ export default function ProductDetailPage() {
                                             variants={{ hidden: { opacity: 0, y: 50 }, visible: { opacity: 1, y: 0 } }}
                                             transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}
                                             onClick={() => setActiveImageIndex(idx)}
-                                            className="group relative aspect-[3/4] cursor-zoom-in overflow-hidden bg-zinc-50"
+                                            className="group relative aspect-3/4 cursor-zoom-in overflow-hidden bg-zinc-50"
                                         >
                                             <Image src={images[idx]} alt={product.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" sizes="50vw" />
                                         </motion.div>
@@ -162,7 +162,7 @@ export default function ProductDetailPage() {
                                     variants={{ hidden: { opacity: 0, y: 50 }, visible: { opacity: 1, y: 0 } }}
                                     transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}
                                     onClick={() => setActiveImageIndex(row.indices[0])}
-                                    className="group relative aspect-[16/10] cursor-zoom-in overflow-hidden bg-zinc-50 md:aspect-[21/9]"
+                                    className="group relative aspect-16/10 cursor-zoom-in overflow-hidden bg-zinc-50 md:aspect-21/9"
                                 >
                                     <Image src={images[row.indices[0]]} alt={product.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" sizes="100vw" />
                                 </motion.div>

@@ -43,14 +43,14 @@ export default function RootLayout({
 
           {/* 2. 平滑滚动容器：Lenis 会接管内部所有内容的滚动行为 */}
           <SmoothScroll>
-          <Suspense fallback={<header className="fixed top-0 z-[100] h-20 w-full bg-white/80 backdrop-blur-md" />}>
-            <Header />
-          </Suspense>
-          <div className="relative flex min-h-screen flex-col">
-            {children}
-            <Footer />
-          </div>
-        </SmoothScroll>
+            <Suspense fallback={<header className="fixed top-0 z-100 h-20 w-full bg-white/80 backdrop-blur-md" />}>
+              <Header />
+            </Suspense>
+            <div className="relative flex min-h-screen flex-col">
+              {children}
+              <Footer />
+            </div>
+          </SmoothScroll>
         </QueryProvider>
       </body>
     </html>

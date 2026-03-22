@@ -98,7 +98,7 @@ export default function MenSection() {
                             {categories.map((category) => (
                                 <motion.div key={category.id} variants={staggerItem} transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}>
                                     <Link href={`/men/${category.slug}`} className="group block">
-                                        <div className="relative aspect-[3/4] overflow-hidden bg-zinc-100">
+                                        <div className="relative aspect-3/4 overflow-hidden bg-zinc-100">
                                             <Image src={category.image} alt={category.name} fill className="object-cover transition-transform duration-1000 ease-out group-hover:scale-110" />
                                             <div className="absolute inset-0 bg-black/0 transition-colors duration-500 group-hover:bg-black/10" />
                                         </div>

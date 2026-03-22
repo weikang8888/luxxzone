@@ -105,7 +105,7 @@ export default function Header() {
     };
 
     return (
-        <header className="fixed top-0 z-[100] w-full transition-all duration-500">
+        <header className="fixed top-0 z-100 w-full transition-all duration-500">
 
             {/* --- 1. Mobile Menu --- */}
             <MobileMenu
@@ -118,7 +118,7 @@ export default function Header() {
 
             {/* --- 2. Search Overlay (极速响应版) --- */}
             <div
-                className={`fixed inset-0 z-[120] flex flex-col transition-all ${isSearchOpen ? "translate-y-0 opacity-100 visible" : "-translate-y-full opacity-0 invisible"
+                className={`fixed inset-0 z-120 flex flex-col transition-all ${isSearchOpen ? "translate-y-0 opacity-100 visible" : "-translate-y-full opacity-0 invisible"
                     }`}
             >
                 {/* 1. 顶部输入区域：始终遮挡 Header */}
@@ -199,7 +199,7 @@ export default function Header() {
                                     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-x-4 gap-y-10 md:gap-x-8 md:gap-y-12">
                                         {searchResult.data.map((p: any) => (
                                             <Link key={p.id} href={`/product/${p.id}`} onClick={() => { setIsSearchOpen(false); setSearchKeyword(""); }} className="group block">
-                                                <div className={`relative aspect-[3/4] overflow-hidden mb-4 ${isScrolled ? "bg-zinc-900 shadow-2xl" : "bg-zinc-50 shadow-lg"}`}>
+                                                <div className={`relative aspect-3/4 overflow-hidden mb-4 ${isScrolled ? "bg-zinc-900 shadow-2xl" : "bg-zinc-50 shadow-lg"}`}>
                                                     <Image src={p.image ?? PLACEHOLDER_IMAGE} alt={p.name} fill className="object-cover transition-all duration-500 group-hover:scale-105" />
                                                 </div>
                                                 <h4 className="truncate text-[10px] font-bold uppercase tracking-widest leading-tight opacity-80">{p.name}</h4>

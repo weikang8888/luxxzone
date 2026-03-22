@@ -5,7 +5,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.luxxzo
 export async function showProductList(
   category_id: number,
   sex_degree: number,
-  options?: { sub_category_id?: number; page?: number; limit?: number; keyword?: string; sort_title?: number; sort_best_selling?: number }
+  options?: { sub_category_id?: number; page?: number; limit?: number; keyword?: string; sort_title?: number; sort_best_selling?: number; sort_new?: number }
 ) {
   const params: Record<string, string | number> = { category_id, sex_degree };
   if (options?.sub_category_id != null) params.sub_category_id = options.sub_category_id;
@@ -14,6 +14,7 @@ export async function showProductList(
   if (options?.keyword) params.keyword = options.keyword;
   if (options?.sort_title != null) params.sort_title = options.sort_title;
   if (options?.sort_best_selling != null) params.sort_best_selling = options.sort_best_selling;
+  if (options?.sort_new != null) params.sort_new = options.sort_new;
   const { data } = await axios.get(`${API_BASE_URL}/products`, { params });
   return data;
 }
@@ -43,5 +44,14 @@ export async function getCategories() {
 
 export async function getProductDetail(id: number) {
   const { data } = await axios.get(`${API_BASE_URL}/products/product_detail/${id}`);
+  return data;
+}
+
+export async function getReviews(options?: { page?: number; limit?: number; sort_target_id?: number }) {
+  const params: Record<string, string | number> = {};
+  if (options?.page != null) params.page = options.page;
+  if (options?.limit != null) params.limit = options.limit;
+  if (options?.sort_target_id != null) params.sort_target_id = options.sort_target_id;
+  const { data } = await axios.get(`${API_BASE_URL}/reviews`, { params });
   return data;
 }

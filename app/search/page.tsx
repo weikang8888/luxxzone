@@ -58,7 +58,7 @@ function SearchContent() {
                     <p className="py-16 text-zinc-500">No products found for &quot;{q}&quot;</p>
                 ) : (
                     <div className="grid grid-cols-2 gap-x-6 gap-y-16 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-10">
-                        {products.map((p: { id: number; name: string; image?: string; badge?: string | null }) => (
+                        {products.map((p: { id: number; name: string; image?: string; badge?: string | string[] | null }) => (
                             <div key={p.id} className="group flex flex-col">
                                 <div className="relative aspect-3/4 mb-6 overflow-hidden bg-zinc-50 transition-transform duration-500 hover:shadow-xl">
                                     <Link href={`/product/${p.id}`}>
@@ -71,9 +71,13 @@ function SearchContent() {
                                         />
                                     </Link>
                                     {p.badge && (
-                                        <span className="absolute left-0 top-4 bg-black px-2 py-1 text-[8px] font-black uppercase tracking-widest text-white">
-                                            {p.badge}
-                                        </span>
+                                        <div className="absolute left-0 top-4 flex flex-wrap gap-1">
+                                            {(Array.isArray(p.badge) ? p.badge : [p.badge]).map((b) => (
+                                                <span key={b} className="bg-black px-2 py-1 text-[8px] font-black uppercase tracking-widest text-white">
+                                                    {b}
+                                                </span>
+                                            ))}
+                                        </div>
                                     )}
                                 </div>
                                 <div className="mb-5 px-1">

@@ -12,24 +12,33 @@ function getProductImage(p: Record<string, unknown>): string {
     return (fromList ?? fromField ?? PLACEHOLDER_IMAGE) as string;
 }
 
+function getBadges(p: Record<string, unknown>): string | string[] | null {
+    const isNew = p.new_tag === 1;
+    const isBestSelling = p.best_selling_tag === 1;
+    if (isNew && isBestSelling) return ["New", "Best Selling"];
+    if (isNew) return "New";
+    if (isBestSelling) return "Best Selling";
+    return (p.badge as string | null) ?? null;
+}
+
 function mapProduct(p: Record<string, unknown>) {
     return {
         id: p.id as number,
         name: (p.title ?? p.name ?? "") as string,
         image: getProductImage(p),
-        badge: p.best_selling_tag ? "Best Selling" : p.new_tag ? "New" : (p.badge as string | null) ?? null,
+        badge: getBadges(p),
     };
 }
 
 export function useProductListInfinite(
     category_id: number | undefined,
     sex_degree: number,
-    options?: { sub_category_id?: number; limit?: number; sort_title?: number; sort_best_selling?: number }
+    options?: { sub_category_id?: number; limit?: number; sort_title?: number; sort_best_selling?: number; sort_new?: number }
 ) {
     const limit = options?.limit ?? DEFAULT_LIMIT;
 
     return useInfiniteQuery({
-        queryKey: ["products", "infinite", category_id, sex_degree, options?.sub_category_id ?? null, limit, options?.sort_title, options?.sort_best_selling],
+        queryKey: ["products", "infinite", category_id, sex_degree, options?.sub_category_id ?? null, limit, options?.sort_title, options?.sort_best_selling, options?.sort_new],
         queryFn: async ({ pageParam }) => {
             if (category_id == null) return { products: [], pagination: null };
             const res = await showProductList(category_id, sex_degree, {
@@ -38,6 +47,7 @@ export function useProductListInfinite(
                 limit,
                 sort_title: options?.sort_title,
                 sort_best_selling: options?.sort_best_selling,
+                sort_new: options?.sort_new,
             });
             const raw = res?.data?.data ?? (Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : []);
             const products = (Array.isArray(raw) ? raw : []).map((p: Record<string, unknown>) => mapProduct(p));

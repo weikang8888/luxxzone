@@ -15,7 +15,14 @@ function mapProduct(p: Record<string, unknown>) {
         id: p.id as number,
         name: (p.title ?? p.name ?? "") as string,
         image: getProductImage(p),
-        badge: p.best_selling_tag ? "Best Selling" : p.new_tag ? "New" : (p.badge as string | null) ?? null,
+        badge: (() => {
+            const isNew = p.new_tag === 1;
+            const isBestSelling = p.best_selling_tag === 1;
+            if (isNew && isBestSelling) return ["New", "Best Selling"];
+            if (isNew) return "New";
+            if (isBestSelling) return "Best Selling";
+            return (p.badge as string | null) ?? null;
+        })(),
     };
 }
 
@@ -39,7 +46,7 @@ export function useFeaturedProducts(limit = 6) {
             const newest = extractData(newestRes).map(mapProduct);
             const bestSellers = extractData(bestSellerRes).map(mapProduct);
             const seen = new Set<number>();
-            const merged: { id: number; name: string; image: string; badge: string | null }[] = [];
+            const merged: { id: number; name: string; image: string; badge?: string | string[] | null }[] = [];
             for (const p of [...newest, ...bestSellers]) {
                 if (!seen.has(p.id)) {
                     seen.add(p.id);

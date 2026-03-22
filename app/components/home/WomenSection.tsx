@@ -73,7 +73,7 @@ export default function WomenSection() {
                     priority
                     className="object-cover object-center brightness-90"
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-r from-black/60 via-black/20 to-transparent" />
 
                 <div className="absolute inset-0 flex items-center p-8 md:p-20 lg:p-32">
                     <div className="max-w-2xl text-white">

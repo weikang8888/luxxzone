@@ -14,13 +14,14 @@ export function nameToSlug(name: string) {
     return name.toLowerCase().replace(/\s+/g, "-");
 }
 
-const sortOptions: { label: string; value: string; sort_title?: number; sort_best_selling?: number }[] = [
+const sortOptions: { label: string; value: string; sort_title?: number; sort_best_selling?: number; sort_new?: number }[] = [
+    { label: "Newest", value: "newest", sort_new: 1 },
     { label: "Best Selling", value: "best-selling", sort_best_selling: 1 },
     { label: "Alphabetical A-Z", value: "alphabetical-a-z", sort_title: 1 },
     { label: "Alphabetical Z-A", value: "alphabetical-z-a", sort_title: 2 },
 ];
 
-type ProductItem = { id: number; name: string; image?: string; badge?: string | null };
+type ProductItem = { id: number; name: string; image?: string; badge?: string | string[] | null };
 
 type Props = {
     gender: "men" | "women";
@@ -60,9 +61,10 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
     const sub_category_id = subCategory?.id;
 
     const selectedSort = sortOptions.find((o) => o.value === currentSort);
-    const sortParams: { sort_title?: number; sort_best_selling?: number } = {};
+    const sortParams: { sort_title?: number; sort_best_selling?: number; sort_new?: number } = {};
     if (selectedSort?.sort_title != null) sortParams.sort_title = selectedSort.sort_title;
     else if (selectedSort?.sort_best_selling != null) sortParams.sort_best_selling = selectedSort.sort_best_selling;
+    else if (selectedSort?.sort_new != null) sortParams.sort_new = selectedSort.sort_new;
 
     const {
         data,
@@ -319,9 +321,13 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
                                             />
                                         </Link>
                                         {p.badge && (
-                                            <span className="absolute left-0 top-4 bg-black px-2 py-1 text-[8px] font-black uppercase tracking-widest text-white">
-                                                {p.badge}
-                                            </span>
+                                            <div className="absolute left-0 top-4 flex flex-wrap gap-1">
+                                                {(Array.isArray(p.badge) ? p.badge : [p.badge]).map((b) => (
+                                                    <span key={b} className="bg-black px-2 py-1 text-[8px] font-black uppercase tracking-widest text-white">
+                                                        {b}
+                                                    </span>
+                                                ))}
+                                            </div>
                                         )}
                                     </div>
 

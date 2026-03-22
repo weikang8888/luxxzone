@@ -35,7 +35,14 @@ export function useProductList(
                 id: p.id,
                 name: p.title ?? p.name ?? "",
                 image: getProductImage(p),
-                badge: p.best_selling_tag ? "Best Selling" : p.new_tag ? "New" : p.badge ?? null,
+                badge: (() => {
+                    const isNew = p.new_tag === 1;
+                    const isBestSelling = p.best_selling_tag === 1;
+                    if (isNew && isBestSelling) return ["New", "Best Selling"];
+                    if (isNew) return "New";
+                    if (isBestSelling) return "Best Selling";
+                    return (p.badge as string | null) ?? null;
+                })(),
             }));
         },
         enabled: category_id != null,

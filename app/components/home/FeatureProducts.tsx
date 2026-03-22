@@ -14,7 +14,7 @@ import "swiper/css/effect-coverflow";
 
 const MOBILE_BREAKPOINT = 1024;
 
-type ProductItem = { id: number; name: string; image: string; badge: string | null };
+type ProductItem = { id: number; name: string; image: string; badge?: string | string[] | null };
 
 function ProductCard({
     product,
@@ -25,7 +25,7 @@ function ProductCard({
 }) {
     return (
         <div className="group relative flex flex-col bg-zinc-950">
-            <div className="relative aspect-[3/4] overflow-hidden">
+            <div className="relative aspect-3/4 overflow-hidden">
                 <Image
                     src={product.image ?? PLACEHOLDER_IMAGE}
                     alt={product.name}
@@ -37,9 +37,13 @@ function ProductCard({
                 <div className={`absolute inset-0 bg-black/10 transition-colors duration-500 group-hover:bg-black/20`} />
 
                 {product.badge && (
-                    <Badge className="absolute left-4 top-4 rounded-none bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-black">
-                        {product.badge}
-                    </Badge>
+                    <div className="absolute left-4 top-4 flex flex-wrap gap-1">
+                        {(Array.isArray(product.badge) ? product.badge : [product.badge]).map((b) => (
+                            <Badge key={b} className="rounded-none bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-black">
+                                {b}
+                            </Badge>
+                        ))}
+                    </div>
                 )}
 
                 <div
@@ -122,7 +126,7 @@ export default function FeaturedProducts() {
             {isLoading ? (
                 <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-8 md:grid-cols-3 md:gap-12">
                     {[...Array(3)].map((_, i) => (
-                        <div key={i} className="aspect-[3/4] animate-pulse bg-zinc-800" />
+                        <div key={i} className="aspect-3/4 animate-pulse bg-zinc-800" />
                     ))}
                 </div>
             ) : products.length === 0 ? (
@@ -146,12 +150,12 @@ export default function FeaturedProducts() {
                             modifier: 1,
                             slideShadows: false,
                         }}
-                        className="!overflow-visible"
+                        className="overflow-visible!"
                     >
                         {(products as ProductItem[]).map((product, index) => {
                             const badge = index === 0 || index === 1 ? "New" : index === 2 ? "Best Selling" : product.badge;
                             return (
-                                <SwiperSlide key={product.id} className="!w-[85vw] sm:!w-[70vw]">
+                                <SwiperSlide key={product.id} className="w-[85vw]! sm:w-[70vw]!">
                                     {({ isActive }: { isActive: boolean }) => (
                                         <ProductCard product={{ ...product, badge }} showHoverAsActive={isActive} />
                                     )}
