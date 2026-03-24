@@ -15,6 +15,7 @@ export function nameToSlug(name: string) {
 }
 
 const sortOptions: { label: string; value: string; sort_title?: number; sort_best_selling?: number; sort_new?: number }[] = [
+    { label: "Default", value: "default" },
     { label: "Newest", value: "newest", sort_new: 1 },
     { label: "Best Selling", value: "best-selling", sort_best_selling: 1 },
     { label: "Alphabetical A-Z", value: "alphabetical-a-z", sort_title: 1 },
@@ -34,7 +35,7 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
     const router = useRouter();
 
     const [isSortOpen, setIsSortOpen] = useState(false);
-    const [currentSort, setCurrentSort] = useState("best-selling");
+    const [currentSort, setCurrentSort] = useState("default");
     const [expandedCatIds, setExpandedCatIds] = useState<Set<number>>(new Set());
     const [collapsedCatIds, setCollapsedCatIds] = useState<Set<number>>(new Set());
 
@@ -44,7 +45,7 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
     const { data: apiCategories = [] } = useCategories();
 
     useEffect(() => {
-        setCurrentSort(searchParams.get("sort") || "best-selling");
+        setCurrentSort(searchParams.get("sort") || "default");
     }, [searchParams]);
 
     const sexDegree = gender === "men" ? 1 : 2;
