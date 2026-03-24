@@ -10,12 +10,11 @@ export default function LoadingScreen() {
   useEffect(() => {
     // 锁定滚动，确保加载时页面不动
     document.body.style.overflow = "hidden";
-    
-    // 强制 2.8 秒后彻底移除组件并恢复滚动
+
     const timer = setTimeout(() => {
       setIsVisible(false);
       document.body.style.overflow = "";
-    }, 2000);
+    }, 900);
 
     return () => {
       document.body.style.overflow = "";
@@ -29,7 +28,7 @@ export default function LoadingScreen() {
         <motion.div
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }} // 🌟 核心：退出时整场渐隐
-          transition={{ duration: 1, ease: [0.43, 0.13, 0.23, 0.96] }}
+          transition={{ duration: 0.4, ease: [0.43, 0.13, 0.23, 0.96] }}
           className="fixed inset-0 z-[9999] flex items-center justify-center bg-white"
         >
           {/* Logo 动画：浮现 -> 停留 -> 放大微散 */}
@@ -42,8 +41,8 @@ export default function LoadingScreen() {
               scale: [0.95, 1, 1, 1.05],
             }}
             transition={{
-              duration: 2.2,
-              times: [0, 0.3, 0.8, 1],
+              duration: 1,
+              times: [0, 0.4, 0.85, 1],
               ease: "easeInOut",
             }}
             className="relative h-24 w-48 md:h-32 md:w-64"
@@ -58,11 +57,11 @@ export default function LoadingScreen() {
           </motion.div>
 
           {/* 装饰性背景：可选，增加一点高级感 */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.05 }}
-            transition={{ duration: 1.5 }}
-            className="absolute inset-0 bg-[radial-gradient(circle,rgba(0,0,0,0.05)_1px,transparent_1px)] bg-[length:24px_24px]" 
+            transition={{ duration: 0.6 }}
+            className="absolute inset-0 bg-[radial-gradient(circle,rgba(0,0,0,0.05)_1px,transparent_1px)] bg-[length:24px_24px]"
           />
         </motion.div>
       )}
