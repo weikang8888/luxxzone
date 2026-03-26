@@ -273,7 +273,7 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
                                                 <button
                                                     key={o.value}
                                                     onClick={() => handleSortSelect(o.value)}
-                                                    className={`text-[9px] font-bold uppercase tracking-widest ${currentSort === o.value ? "text-black" : "text-zinc-400 hover:text-black"}`}
+                                                    className={`text-[11px] font-bold uppercase tracking-widest ${currentSort === o.value ? "text-black" : "text-zinc-400 hover:text-black"}`}
                                                 >
                                                     {o.label}
                                                 </button>
