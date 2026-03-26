@@ -39,7 +39,7 @@ export default function HeroSection() {
                 >
                     <motion.span
                         variants={textItem}
-                        className="inline-block text-[10px] font-bold uppercase tracking-[0.4em] text-zinc-400 md:text-[11px]"
+                        className="inline-block text-[10px] font-bold uppercase tracking-[0.4em] text-zinc-400 md:text-[13px]"
                     >
                         Series 01 / SS 2026
                     </motion.span>
@@ -61,7 +61,7 @@ export default function HeroSection() {
 
                     <motion.span
                         variants={textItem}
-                        className="inline-block text-[10px] font-bold uppercase tracking-[0.4em] text-zinc-400 md:text-[11px]"
+                        className="inline-block text-[10px] font-bold uppercase tracking-[0.4em] text-zinc-400 md:text-[13px]"
                     >
                         Luxury Fashion for Modern Style
                     </motion.span>
@@ -69,7 +69,7 @@ export default function HeroSection() {
                     <motion.div variants={textItem} className="flex justify-center pt-2 md:justify-start md:pt-4">
                         <Button
                             variant="outline"
-                            className="group relative h-14 w-full max-w-[200px] overflow-hidden rounded-none border-zinc-950 bg-transparent px-0 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-950 transition-all duration-700 hover:text-white md:h-16 md:max-w-[240px] md:text-[11px]"
+                            className="group relative h-14 w-full max-w-[200px] overflow-hidden rounded-none border-zinc-950 bg-transparent px-0 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-950 transition-all duration-700 hover:text-white md:h-16 md:max-w-[240px] md:text-[13px]"
                         >
                             <Link href="#collection" className="relative z-10 flex h-full w-full items-center justify-center">
                                 Explore Edition

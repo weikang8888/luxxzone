@@ -126,7 +126,7 @@ export default function WhyChooseUs() {
           viewport={{ once: true, amount: 0.15 }}
           variants={fadeInUp}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="mb-4 block text-center text-[10px] font-bold uppercase tracking-[0.5em] text-zinc-400"
+          className="mb-4 block text-center text-[10px] md:text-[12px] font-bold uppercase tracking-[0.5em] text-zinc-400"
         >
           The House Difference
         </motion.span>

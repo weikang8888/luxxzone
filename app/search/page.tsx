@@ -37,7 +37,7 @@ function SearchContent() {
         <main className="min-h-screen bg-white pb-20 pt-24 md:pt-40">
             <div className="mx-auto max-w-[1920px] px-6 md:px-16">
                 <div className="mb-12 border-b border-zinc-100 pb-10">
-                    <span className="mb-4 block text-[10px] font-bold uppercase tracking-[0.5em] text-zinc-300">
+                    <span className="mb-4 block text-[10px] md:text-[12px] font-bold uppercase tracking-[0.5em] text-zinc-300">
                         Luxxzone / Search
                     </span>
                     <h1 className="text-5xl font-black uppercase leading-none tracking-tighter md:text-8xl">
@@ -81,7 +81,7 @@ function SearchContent() {
                                     )}
                                 </div>
                                 <div className="mb-5 px-1">
-                                    <h3 className="mb-1 truncate text-[10px] font-black uppercase tracking-widest text-zinc-950">
+                                    <h3 className="mb-1 truncate text-[10px] md:text-[12px] font-black uppercase tracking-widest text-zinc-950">
                                         {p.name}
                                     </h3>
                                     <p className="text-[9px] font-medium italic tracking-[0.2em] text-zinc-400">Seasonal Edition</p>
@@ -91,7 +91,7 @@ function SearchContent() {
                                         href={`https://wa.me/${WHATSAPP_NUMBER}?text=Hi, I am interested in ${p.name}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex w-full items-center justify-center gap-3 bg-[#25D366] py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white shadow-sm transition-all hover:bg-[#20ba5a] active:scale-95"
+                                        className="flex w-full items-center justify-center gap-3 bg-[#25D366] py-3 text-[10px] md:text-[12px] font-black uppercase tracking-[0.2em] text-white shadow-sm transition-all hover:bg-[#20ba5a] active:scale-95"
                                     >
                                         <MessageCircle className="size-4" />
                                         <span>INQUIRE NOW</span>

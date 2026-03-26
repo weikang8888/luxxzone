@@ -147,7 +147,7 @@ export default function Feedback() {
                         <div className="h-px w-10 bg-zinc-700" />
                         <div>
                           <p className="text-xs font-bold uppercase tracking-widest text-white sm:text-sm">{name}</p>
-                          <p className="mt-1 text-[10px] uppercase tracking-[0.3em] text-zinc-500">{detail}</p>
+                          <p className="mt-1 text-[10px] md:text-[12px] uppercase tracking-[0.3em] text-zinc-500">{detail}</p>
                         </div>
                       </div>
                     </div>

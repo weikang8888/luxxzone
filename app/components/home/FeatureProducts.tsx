@@ -39,7 +39,7 @@ function ProductCard({
                 {product.badge && (
                     <div className="absolute left-4 top-4 flex flex-wrap gap-1">
                         {(Array.isArray(product.badge) ? product.badge : [product.badge]).map((b) => (
-                            <Badge key={b} className="rounded-none bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-black">
+                            <Badge key={b} className="rounded-none bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-black md:text-[12px]">
                                 {b}
                             </Badge>
                         ))}
@@ -52,7 +52,7 @@ function ProductCard({
                 >
                     <Link
                         href={`/product/${product.id}`}
-                        className="flex h-14 w-full items-center justify-center rounded-none border border-white bg-white py-6 text-[10px] font-black uppercase tracking-[0.3em] text-black transition-all duration-500 md:h-16 md:bg-transparent md:text-[11px] md:text-white md:group-hover:bg-white md:group-hover:text-black"
+                        className="flex h-14 w-full items-center justify-center rounded-none border border-white bg-white py-6 text-[10px] font-black uppercase tracking-[0.3em] text-black transition-all duration-500 md:h-16 md:bg-transparent md:text-[13px] md:text-white md:group-hover:bg-white md:group-hover:text-black"
                     >
                         Quick View
                     </Link>
@@ -61,7 +61,7 @@ function ProductCard({
 
             <div className="mt-6 flex flex-col items-center gap-1">
                 <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-white">{product.name}</h3>
-                <span className="text-[10px] tracking-widest text-zinc-500 uppercase">Available in Studio</span>
+                <span className="text-[10px] tracking-widest text-zinc-500 uppercase md:text-[12px]">Available in Studio</span>
             </div>
         </div>
     );
@@ -106,7 +106,7 @@ export default function FeaturedProducts() {
                     viewport={{ once: true, amount: 0.15 }}
                     variants={fadeInUp}
                     transition={{ duration: 0.8 }}
-                    className="mb-4 block text-[10px] font-bold uppercase tracking-[0.5em] text-zinc-500"
+                    className="mb-4 block text-[10px] font-bold uppercase tracking-[0.5em] text-zinc-500 md:text-[12px]"
                 >
                     Curated Selection
                 </motion.span>

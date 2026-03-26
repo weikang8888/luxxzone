@@ -149,7 +149,7 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
                             transition={{ duration: 0.8, ease: "easeOut", staggerChildren: 0.05 }}
                             className="mb-12"
                         >
-                            <h2 className="mb-8 text-[10px] font-black uppercase tracking-[0.4em] text-zinc-300">Navigation</h2>
+                            <h2 className="mb-8 text-[10px] font-black uppercase tracking-[0.35em] text-zinc-300 md:text-[12px]">Navigation</h2>
                             <nav className="flex flex-col space-y-7">
                                 {sidebarCategories.map((cat) => {
                                     const catSlug = nameToSlug(cat.name);
@@ -164,7 +164,7 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
                                             <div className="flex items-center justify-between gap-2">
                                                 <Link
                                                     href={baseHref}
-                                                    className={`text-[11px] font-black uppercase tracking-widest transition-all ${slug === catSlug ? "text-black" : "text-zinc-400 hover:text-black"}`}
+                                                    className={`text-[10px] font-black uppercase tracking-widest transition-all md:text-[13px] ${slug === catSlug ? "text-black" : "text-zinc-400 hover:text-black"}`}
                                                 >
                                                     {cat.name}
                                                 </Link>
@@ -184,7 +184,7 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
                                                             transition={{ duration: 0.25, ease: "easeInOut" }}
                                                             className="block"
                                                         >
-                                                            <ChevronDown className="size-4" />
+                                                            <ChevronDown className="size-[18px]" />
                                                         </motion.span>
                                                     </button>
                                                 )}
@@ -213,7 +213,7 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
                                                             <motion.div variants={{ hidden: { opacity: 0, x: -8 }, visible: { opacity: 1, x: 0 } }}>
                                                                 <Link
                                                                     href={baseHref}
-                                                                    className={`text-[9px] font-bold uppercase tracking-widest ${slug === catSlug && !subSlug ? "text-black" : "text-zinc-400 hover:text-black"}`}
+                                                                    className={`text-[10px] font-bold uppercase tracking-widest md:text-[11px] ${slug === catSlug && !subSlug ? "text-black" : "text-zinc-400 hover:text-black"}`}
                                                                 >
                                                                     Shop All
                                                                 </Link>
@@ -225,7 +225,7 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
                                                                     <motion.div key={sub.id} variants={{ hidden: { opacity: 0, x: -8 }, visible: { opacity: 1, x: 0 } }}>
                                                                         <Link
                                                                             href={subHref}
-                                                                            className={`text-[9px] font-bold uppercase tracking-widest ${isActive ? "text-black" : "text-zinc-400 hover:text-black"}`}
+                                                                            className={`text-[10px] font-bold uppercase tracking-widest md:text-[11px] ${isActive ? "text-black" : "text-zinc-400 hover:text-black"}`}
                                                                         >
                                                                             {sub.name}
                                                                         </Link>
@@ -248,12 +248,12 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
                 <section className="flex-1 min-w-0">
                     <div className="mb-12 flex flex-col border-b border-zinc-100 pb-10">
                         <div className="mb-8">
-                            <span className="mb-4 block text-[10px] font-bold uppercase tracking-[0.5em] text-zinc-300">{breadcrumb}</span>
+                            <span className="mb-4 block text-[10px] font-bold uppercase tracking-[0.5em] text-zinc-300 md:text-[12px]">{breadcrumb}</span>
                             <h1 className="text-5xl font-black uppercase leading-none tracking-tighter md:text-8xl">{displayTitle}</h1>
                         </div>
 
                         <div className="flex items-end justify-between md:items-center">
-                            <p className="text-[11px] font-black uppercase tracking-widest text-zinc-400">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 md:text-[11px]">
                                 Total: {products.length} <span className="hidden sm:inline">Items</span>
                             </p>
 
@@ -261,7 +261,7 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
                                 <button
                                     type="button"
                                     onClick={() => setIsSortOpen(!isSortOpen)}
-                                    className="flex items-center gap-2 border-b-2 border-black pb-1 text-[10px] font-black uppercase tracking-widest"
+                                    className="flex items-center gap-2 border-b-2 border-black pb-1 text-[10px] font-black uppercase tracking-widest md:text-[12px]"
                                 >
                                     Sort: {sortOptions.find(o => o.value === currentSort)?.label}
                                     <ChevronDown className={`size-3 transition-transform ${isSortOpen ? 'rotate-180' : ''}`} />
@@ -311,7 +311,7 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
                                     transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
                                     className="group flex flex-col"
                                 >
-                                    <div className="relative aspect-[3/4] overflow-hidden bg-zinc-50 mb-6 transition-transform duration-500 hover:shadow-xl">
+                                    <div className="relative aspect-3/4 mb-6 overflow-hidden bg-zinc-50 transition-transform duration-500 hover:shadow-xl">
                                         <Link href={`/product/${p.id}`}>
                                             <Image
                                                 src={p.image ?? PLACEHOLDER_IMAGE}
@@ -319,6 +319,7 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
                                                 fill
                                                 className="object-cover transition-transform duration-[1.5s] ease-out md:group-hover:scale-105"
                                                 sizes="(max-width: 768px) 50vw, 25vw"
+                                                quality={80}
                                             />
                                         </Link>
                                         {p.badge && (
@@ -333,10 +334,10 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
                                     </div>
 
                                     <div className="mb-5 px-1">
-                                        <h3 className="text-[10px] font-black uppercase tracking-widest mb-1 truncate text-zinc-950">
+                                        <h3 className="mb-1 truncate text-[11px] font-black uppercase tracking-widest text-zinc-950 md:text-[15px]">
                                             {p.name}
                                         </h3>
-                                        <p className="text-[9px] font-medium tracking-[0.2em] text-zinc-400 italic">
+                                        <p className="text-[10px] font-medium italic tracking-[0.2em] text-zinc-400 md:text-[13px]">
                                             Seasonal Edition
                                         </p>
                                     </div>
@@ -346,7 +347,7 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
                                             href={`https://wa.me/${WHATSAPP_NUMBER}?text=Hi, I am interested in ${p.name}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="flex w-full items-center justify-center gap-3 bg-[#25D366] py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white transition-all active:scale-95 hover:bg-[#20ba5a] shadow-sm"
+                                            className="flex w-full items-center justify-center gap-3 bg-[#25D366] py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white transition-all hover:bg-[#20ba5a] active:scale-95 shadow-sm md:text-[12px]"
                                         >
                                             <MessageCircle className="size-4" />
                                             <span>INQUIRE NOW</span>
@@ -362,7 +363,7 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
                             {isFetchingNextPage && (
                                 <div className="grid grid-cols-2 gap-x-6 gap-y-16 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-10">
                                     {[...Array(4)].map((_, i) => (
-                                        <div key={i} className="aspect-[3/4] animate-pulse bg-zinc-100" />
+                                        <div key={i} className="aspect-3/4 animate-pulse bg-zinc-100" />
                                     ))}
                                 </div>
                             )}

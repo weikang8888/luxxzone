@@ -103,7 +103,7 @@ export default function MobileMenu({ isOpen, onClose, activeGender, onGenderSwit
                                                     <Link
                                                         key={sub.id}
                                                         href={sub.href}
-                                                        className="text-[12px] font-bold uppercase tracking-widest text-zinc-400 hover:text-black"
+                                                        className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:text-black"
                                                         onClick={onClose}
                                                     >
                                                         {sub.label}

@@ -81,6 +81,7 @@ export default function ProductDetailPage() {
                                 fill
                                 className="object-contain"
                                 priority
+                                quality={100}
                             />
                         </div>
 
@@ -104,7 +105,7 @@ export default function ProductDetailPage() {
                         </div>
 
                         {/* 頁碼計數 */}
-                        <div className="absolute bottom-12 text-[10px] font-black uppercase tracking-[0.5em] text-zinc-400">
+                        <div className="absolute bottom-12 text-[10px] md:text-[12px] font-black uppercase tracking-[0.5em] text-zinc-400">
                             Image {activeImageIndex + 1} <span className="mx-2 text-zinc-200">/</span> {images.length}
                         </div>
                     </motion.div>
@@ -152,7 +153,7 @@ export default function ProductDetailPage() {
                                             onClick={() => setActiveImageIndex(idx)}
                                             className="group relative aspect-3/4 cursor-zoom-in overflow-hidden bg-zinc-50"
                                         >
-                                            <Image src={images[idx]} alt={product.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" sizes="50vw" />
+                                            <Image src={images[idx]} alt={product.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" sizes="50vw" quality={100}/>
                                         </motion.div>
                                     ))}
                                 </div>
@@ -164,7 +165,7 @@ export default function ProductDetailPage() {
                                     onClick={() => setActiveImageIndex(row.indices[0])}
                                     className="group relative aspect-16/10 cursor-zoom-in overflow-hidden bg-zinc-50 md:aspect-21/9"
                                 >
-                                    <Image src={images[row.indices[0]]} alt={product.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" sizes="100vw" />
+                                    <Image src={images[row.indices[0]]} alt={product.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" sizes="100vw" quality={100} />
                                 </motion.div>
                             )
                         );
@@ -175,12 +176,12 @@ export default function ProductDetailPage() {
                 <aside className="mt-12 w-full md:mt-0 md:w-[35%] lg:w-[30%]">
                     <div className="sticky top-40 space-y-10">
                         <div className="space-y-4 border-b border-zinc-100 pb-10">
-                            <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-zinc-300">{product.collection}</span>
+                            <span className="text-[10px] md:text-[12px] font-bold uppercase tracking-[0.5em] text-zinc-300">{product.collection}</span>
                             <h1 className="text-4xl font-black uppercase tracking-tighter text-zinc-950 lg:text-5xl">{product.name}</h1>
                         </div>
 
                         <div className="space-y-4">
-                            <span className="text-[10px] font-black uppercase tracking-widest block">Select Size</span>
+                            <span className="text-[10px] md:text-[12px] font-black uppercase tracking-widest block">Select Size</span>
                             <div className="flex flex-wrap gap-2">
                                 {["EU 46", "EU 48", "EU 50", "EU 52"].map((size) => (
                                     <button key={size} onClick={() => setSelectedSize(size)}

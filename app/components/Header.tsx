@@ -182,7 +182,7 @@ export default function Header() {
                                             .slice(0, 8)
                                             .map(sub => (
                                                 <Link key={sub.id} href={sub.href} onClick={() => setIsSearchOpen(false)}
-                                                    className={`text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] border px-3 py-1.5 md:border-none md:p-0 transition-colors ${isScrolled ? "border-zinc-800 text-zinc-500 hover:text-white" : "border-zinc-100 text-zinc-400 hover:text-black"
+                                                    className={`text-[10px] md:text-[13px] font-bold uppercase tracking-[0.2em] border px-3 py-1.5 md:border-none md:p-0 transition-colors ${isScrolled ? "border-zinc-800 text-zinc-500 hover:text-white" : "border-zinc-100 text-zinc-400 hover:text-black"
                                                         }`}>
                                                     {sub.label}
                                                 </Link>
@@ -202,7 +202,7 @@ export default function Header() {
                                                 <div className={`relative aspect-3/4 overflow-hidden mb-4 ${isScrolled ? "bg-zinc-900 shadow-2xl" : "bg-zinc-50 shadow-lg"}`}>
                                                     <Image src={p.image ?? PLACEHOLDER_IMAGE} alt={p.name} fill className="object-cover transition-all duration-500 group-hover:scale-105" />
                                                 </div>
-                                                <h4 className="truncate text-[10px] font-bold uppercase tracking-widest leading-tight opacity-80">{p.name}</h4>
+                                                <h4 className="truncate text-[10px] md:text-[12px] font-bold uppercase tracking-widest leading-tight opacity-80">{p.name}</h4>
                                             </Link>
                                         ))}
                                     </div>
@@ -226,7 +226,7 @@ export default function Header() {
                     <div className="absolute left-1/2 flex -translate-x-1/2 items-center gap-10 md:gap-24">
                         <button
                             onClick={() => handleGenderSwitch("men")}
-                            className={`hidden text-[12px] font-black uppercase tracking-[0.3em] transition-all duration-500 md:block ${activeGender === "men" ? (isScrolled ? "text-white scale-110" : "text-black scale-110") : "text-zinc-400 hover:text-zinc-500"}`}
+                            className={`hidden md:text-[12px] font-black uppercase tracking-[0.3em] transition-all duration-500 md:block ${activeGender === "men" ? (isScrolled ? "text-white scale-110" : "text-black scale-110") : "text-zinc-400 hover:text-zinc-500"}`}
                         >
                             Men
                         </button>
@@ -238,7 +238,7 @@ export default function Header() {
 
                         <button
                             onClick={() => handleGenderSwitch("women")}
-                            className={`hidden text-[12px] font-black uppercase tracking-[0.3em] transition-all duration-500 md:block ${activeGender === "women" ? (isScrolled ? "text-white scale-110" : "text-black scale-110") : "text-zinc-400 hover:text-zinc-500"}`}
+                            className={`hidden md:text-[12px] font-black uppercase tracking-[0.3em] transition-all duration-500 md:block ${activeGender === "women" ? (isScrolled ? "text-white scale-110" : "text-black scale-110") : "text-zinc-400 hover:text-zinc-500"}`}
                         >
                             Women
                         </button>
@@ -260,7 +260,7 @@ export default function Header() {
                             <Link
                                 key={item.id}
                                 href={`/${activeGender}/${item.slug}`}
-                                className={`group relative text-[11px] font-black uppercase tracking-[0.15em] transition-colors ${isScrolled ? "text-zinc-400 hover:text-white" : "text-zinc-500 hover:text-black"}`}
+                                className={`group relative text-[12px] font-black uppercase tracking-[0.15em] transition-colors ${isScrolled ? "text-zinc-400 hover:text-white" : "text-zinc-500 hover:text-black"}`}
                             >
                                 {item.label}
                                 <span className={`absolute -bottom-1 left-0 h-px w-0 transition-all duration-300 group-hover:w-full ${isScrolled ? "bg-white" : "bg-black"}`} />
