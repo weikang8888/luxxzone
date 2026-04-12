@@ -153,7 +153,7 @@ export default function ProductDetailPage() {
                                             onClick={() => setActiveImageIndex(idx)}
                                             className="group relative aspect-3/4 cursor-zoom-in overflow-hidden bg-zinc-50"
                                         >
-                                            <Image src={images[idx]} alt={product.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" sizes="50vw" quality={100}/>
+                                            <Image src={images[idx]} alt={product.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" sizes="50vw" quality={75}/>
                                         </motion.div>
                                     ))}
                                 </div>
@@ -165,7 +165,7 @@ export default function ProductDetailPage() {
                                     onClick={() => setActiveImageIndex(row.indices[0])}
                                     className="group relative aspect-16/10 cursor-zoom-in overflow-hidden bg-zinc-50 md:aspect-21/9"
                                 >
-                                    <Image src={images[row.indices[0]]} alt={product.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" sizes="100vw" quality={100} />
+                                    <Image src={images[row.indices[0]]} alt={product.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" sizes="100vw" quality={75} />
                                 </motion.div>
                             )
                         );
@@ -180,16 +180,44 @@ export default function ProductDetailPage() {
                             <h1 className="text-4xl font-black uppercase tracking-tighter text-zinc-950 lg:text-5xl">{product.name}</h1>
                         </div>
 
-                        <div className="space-y-4">
-                            <span className="text-[10px] md:text-[12px] font-black uppercase tracking-widest block">Select Size</span>
-                            <div className="flex flex-wrap gap-2">
-                                {["EU 46", "EU 48", "EU 50", "EU 52"].map((size) => (
-                                    <button key={size} onClick={() => setSelectedSize(size)}
-                                        className={`flex h-12 w-24 items-center justify-center border text-[11px] font-bold transition-all ${selectedSize === size ? "border-black bg-black text-white" : "border-zinc-100 text-zinc-400 hover:border-black hover:text-black"
-                                            }`}
-                                    >{size}</button>
-                                ))}
-                            </div>
+                        <div className="space-y-6 border-b border-zinc-100 pb-10 text-[11px] leading-relaxed tracking-wide text-zinc-500 md:text-[12px]">
+                            <section className="space-y-3">
+                                <h2 className="text-[10px] font-black uppercase tracking-widest text-zinc-950 md:text-[12px]">Return policy :</h2>
+                                <p>
+                                    If you are not satisfied with our quality, we accept refunds and returns.
+                                </p>
+                                <ul className="space-y-1.5">
+                                    <li>-Please make sure the tag is not cut off</li>
+                                    <li>-Please make sure the goods are not damaged in any way</li>
+                                    <li>-We won&apos;t bear the cost of sending back</li>
+                                </ul>
+                            </section>
+                            <section className="space-y-2">
+                                <h2 className="text-[10px] font-black uppercase tracking-widest text-zinc-950 md:text-[12px]">Online customer service :</h2>
+                                <p>
+                                    Whatsapps :{" "}
+                                    <a
+                                        href="https://wa.me/60142918390"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="font-semibold text-zinc-800 underline decoration-zinc-300 underline-offset-2 hover:text-black"
+                                    >
+                                        +6014-2918390
+                                    </a>
+                                </p>
+                            </section>
+                            <section className="space-y-2">
+                                <p>
+                                    <span className="font-black uppercase tracking-wide text-zinc-950">Pre-order :</span>{" "}
+                                    7- 15 working days to arrive your doorstep
+                                </p>
+                                <p className="text-zinc-400">
+                                    [ Working days does not include weekend &amp; public holidays ]
+                                </p>
+                                <p className="text-zinc-400">
+                                    ( If you need size guide, please provide us your height &amp; weight so we can estimate the suitable size for you)
+                                </p>
+                            </section>
                         </div>
 
                         <div className="space-y-3">
