@@ -114,7 +114,7 @@ export default function ProductDetailPage() {
 
             <div className="mx-auto flex max-w-[1920px] flex-col px-6 md:flex-row md:px-16 lg:gap-20">
 
-                {/* ================= 1. 画廊 2+1+2+1+2... 布局 ================= */}
+                {/* ================= 1. 画廊 2+2+2+2 两列网格 ================= */}
                 <motion.div
                     initial="hidden"
                     whileInView="visible"
@@ -128,48 +128,25 @@ export default function ProductDetailPage() {
                     }}
                     className="flex-1 space-y-4 md:space-y-6 lg:w-[65%]"
                 >
-                    {(() => {
-                        const rows: { type: "pair" | "single"; indices: number[] }[] = [];
-                        let i = 0;
-                        let step = 0;
-                        while (i < images.length) {
-                            if (step % 2 === 0) {
-                                rows.push({ type: "pair", indices: [i, i + 1].filter((idx) => idx < images.length) });
-                                i += 2;
-                            } else {
-                                rows.push({ type: "single", indices: [i] });
-                                i += 1;
-                            }
-                            step++;
-                        }
-                        return rows.map((row, rowIdx) =>
-                            row.type === "pair" ? (
-                                <div key={rowIdx} className="grid grid-cols-2 gap-4 md:gap-6">
-                                    {row.indices.map((idx) => (
-                                        <motion.div
-                                            key={idx}
-                                            variants={{ hidden: { opacity: 0, y: 50 }, visible: { opacity: 1, y: 0 } }}
-                                            transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}
-                                            onClick={() => setActiveImageIndex(idx)}
-                                            className="group relative aspect-3/4 cursor-zoom-in overflow-hidden bg-zinc-50"
-                                        >
-                                            <Image src={images[idx]} alt={product.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" sizes="50vw" quality={75}/>
-                                        </motion.div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <motion.div
-                                    key={rowIdx}
-                                    variants={{ hidden: { opacity: 0, y: 50 }, visible: { opacity: 1, y: 0 } }}
-                                    transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}
-                                    onClick={() => setActiveImageIndex(row.indices[0])}
-                                    className="group relative aspect-16/10 cursor-zoom-in overflow-hidden bg-zinc-50 md:aspect-21/9"
-                                >
-                                    <Image src={images[row.indices[0]]} alt={product.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" sizes="100vw" quality={75} />
-                                </motion.div>
-                            )
+                    {Array.from({ length: Math.ceil(images.length / 2) }, (_, rowIdx) => {
+                        const start = rowIdx * 2;
+                        const indices = [start, start + 1].filter((idx) => idx < images.length);
+                        return (
+                            <div key={rowIdx} className="grid grid-cols-2 gap-4 md:gap-6">
+                                {indices.map((idx) => (
+                                    <motion.div
+                                        key={idx}
+                                        variants={{ hidden: { opacity: 0, y: 50 }, visible: { opacity: 1, y: 0 } }}
+                                        transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}
+                                        onClick={() => setActiveImageIndex(idx)}
+                                        className="group relative aspect-3/4 cursor-zoom-in overflow-hidden bg-zinc-50"
+                                    >
+                                        <Image src={images[idx]} alt={product.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" sizes="50vw" quality={75} />
+                                    </motion.div>
+                                ))}
+                            </div>
                         );
-                    })()}
+                    })}
                 </motion.div>
 
                 {/* ================= 2. 右侧信息 (保持 Sticky) ================= */}
@@ -197,7 +174,7 @@ export default function ProductDetailPage() {
                                 <p>
                                     Whatsapps :{" "}
                                     <a
-                                        href="https://wa.me/60142918390"
+                                        href={`https://wa.me/${WHATSAPP_NUMBER}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="font-semibold text-zinc-800 underline decoration-zinc-300 underline-offset-2 hover:text-black"

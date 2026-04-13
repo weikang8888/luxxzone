@@ -1,4 +1,6 @@
-export const WHATSAPP_NUMBER = "6581234567";
+export const WHATSAPP_NUMBER = "60142918390";
+
+export const TELEGRAM_URL = "https://t.me/LuxxZoneee";
 
 export const PLACEHOLDER_IMAGE = "/fallback.jpg";
 

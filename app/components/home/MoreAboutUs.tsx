@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "../Button";
+import { TELEGRAM_URL } from "@/lib/constants";
 
 function TelegramIcon({ className }: { className?: string }) {
   return (
@@ -65,7 +66,7 @@ export default function MoreAboutUs() {
         <motion.div variants={staggerItem} transition={{ duration: 1.2 }} className="pt-4">
           <Button variant="primary" className="group relative h-16 w-full px-0">
             <Link
-              href="https://t.me/luxxzone"
+              href={TELEGRAM_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="flex h-full w-full items-center justify-center gap-3 px-10"
