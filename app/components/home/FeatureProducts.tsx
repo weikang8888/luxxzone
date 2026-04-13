@@ -7,7 +7,6 @@ import { motion } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectCoverflow } from "swiper/modules";
 import { Badge } from "../Badge";
-import { useFeaturedProducts } from "@/app/hooks/useFeaturedProducts";
 import { PLACEHOLDER_IMAGE } from "@/lib/constants";
 import "swiper/css";
 import "swiper/css/effect-coverflow";
@@ -15,6 +14,12 @@ import "swiper/css/effect-coverflow";
 const MOBILE_BREAKPOINT = 1024;
 
 type ProductItem = { id: number; name: string; image: string; badge?: string | string[] | null };
+
+const FEATURED_PRODUCTS: ProductItem[] = [
+    { id: 1, name: "Featured Piece I", image: "/111.jpg" },
+    { id: 2, name: "Featured Piece II", image: "/444.jpg" },
+    { id: 3, name: "Featured Piece III", image: "/333.jpg" },
+];
 
 function ProductCard({
     product,
@@ -36,7 +41,7 @@ function ProductCard({
                 />
                 <div className={`absolute inset-0 bg-black/10 transition-colors duration-500 group-hover:bg-black/20`} />
 
-                {product.badge && (
+                {/* {product.badge && (
                     <div className="absolute left-4 top-4 flex flex-wrap gap-1">
                         {(Array.isArray(product.badge) ? product.badge : [product.badge]).map((b) => (
                             <Badge key={b} className="rounded-none bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-black md:text-[12px]">
@@ -44,7 +49,7 @@ function ProductCard({
                             </Badge>
                         ))}
                     </div>
-                )}
+                )} */}
 
                 <div
                     className={`absolute bottom-0 left-0 right-0 p-4 transition-all duration-500 ease-out
@@ -87,7 +92,7 @@ const staggerItem = {
 
 export default function FeaturedProducts() {
     const [isMobile, setIsMobile] = useState(false);
-    const { data: products = [], isLoading } = useFeaturedProducts(3);
+    const products = FEATURED_PRODUCTS;
 
     useEffect(() => {
         const mq = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
@@ -123,17 +128,7 @@ export default function FeaturedProducts() {
             </div>
 
             {/* Mobile: 直接渲染 Swiper，避免 motion opacity 导致不显示 */}
-            {isLoading ? (
-                <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-8 md:grid-cols-3 md:gap-12">
-                    {[...Array(3)].map((_, i) => (
-                        <div key={i} className="aspect-3/4 animate-pulse bg-zinc-800" />
-                    ))}
-                </div>
-            ) : products.length === 0 ? (
-                <div className="mx-auto max-w-[1400px] py-16 text-center text-zinc-500">
-                    No featured products yet.
-                </div>
-            ) : isMobile ? (
+            {isMobile ? (
                 <div className="mx-auto max-w-[1400px] overflow-x-clip">
                     <Swiper
                         effect="coverflow"
