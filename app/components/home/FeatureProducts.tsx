@@ -18,7 +18,7 @@ type ProductItem = { id: number; name: string; image: string; badge?: string | s
 const FEATURED_PRODUCTS: ProductItem[] = [
     { id: 1, name: "Featured Piece I", image: "/111.jpg" },
     { id: 2, name: "Featured Piece II", image: "/444.jpg" },
-    { id: 3, name: "Featured Piece III", image: "/333.jpg" },
+    { id: 3, name: "Featured Piece III", image: "/555.jpg" },
 ];
 
 function ProductCard({

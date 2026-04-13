@@ -45,7 +45,7 @@ export default function LoadingScreen() {
               times: [0, 0.4, 0.85, 1],
               ease: "easeInOut",
             }}
-            className="relative h-24 w-48 md:h-[500px] md:w-[500px]"
+            className="relative h-[300px] w-[300px] md:h-[500px] md:w-[500px]"
           >
             <Image
               src="/logo.png"
