@@ -55,3 +55,8 @@ export async function getReviews(options?: { page?: number; limit?: number; sort
   const { data } = await axios.get(`${API_BASE_URL}/reviews`, { params });
   return data;
 }
+
+export async function getSpotlightSections() {
+  const { data } = await axios.get(`${API_BASE_URL}/spotlight_sections`);
+  return data;
+}

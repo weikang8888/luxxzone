@@ -6,20 +6,66 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectCoverflow } from "swiper/modules";
-import { Badge } from "../Badge";
+import { useQuery } from "@tanstack/react-query";
+import { getSpotlightSections } from "@/app/api/api";
 import { PLACEHOLDER_IMAGE } from "@/lib/constants";
 import "swiper/css";
 import "swiper/css/effect-coverflow";
 
 const MOBILE_BREAKPOINT = 1024;
 
-type ProductItem = { id: number; name: string; image: string; badge?: string | string[] | null };
+type ProductItem = {
+    id: number;
+    name: string;
+    image: string;
+    href: string;
+    badge?: string | string[] | null;
+};
 
-const FEATURED_PRODUCTS: ProductItem[] = [
-    { id: 1, name: "Featured Piece I", image: "/111.jpg" },
-    { id: 2, name: "Featured Piece II", image: "/444.jpg" },
-    { id: 3, name: "Featured Piece III", image: "/555.jpg" },
-];
+type SpotlightFeaturedData = {
+    sectionTitle: string;
+    redirectUrl: string;
+    products: ProductItem[];
+};
+
+function normalizeFeaturedProducts(raw: unknown): SpotlightFeaturedData {
+    const payload = (raw as { data?: unknown })?.data ?? raw;
+    const sections = Array.isArray(payload) ? payload : [];
+    const firstSection = sections.find((section) => {
+        if (!section || typeof section !== "object") return false;
+        const maybeItems = (section as { items?: unknown }).items;
+        return Array.isArray(maybeItems) && maybeItems.length > 0;
+    }) as { title?: unknown; redirect_url?: unknown; items?: unknown } | undefined;
+
+    const sectionTitle = typeof firstSection?.title === "string" && firstSection.title.trim().length > 0
+        ? firstSection.title
+        : "Curated Selection";
+    const redirectUrl = typeof firstSection?.redirect_url === "string" && firstSection.redirect_url.trim().length > 0
+        ? firstSection.redirect_url
+        : "/women/new-arrival";
+    const rawProducts = Array.isArray(firstSection?.items) ? firstSection.items : [];
+
+    const products = rawProducts
+        .filter((item): item is Record<string, unknown> => Boolean(item && typeof item === "object"))
+        .map((item) => {
+            const imageList = item.image_list;
+            const firstImage = Array.isArray(imageList) && typeof imageList[0] === "string"
+                ? imageList[0]
+                : undefined;
+            const image = (item.image as string | undefined)
+                ?? (item.image_url as string | undefined)
+                ?? (item.cover_image as string | undefined)
+                ?? firstImage
+                ?? PLACEHOLDER_IMAGE;
+            const title = (item.title as string | undefined) ?? (item.name as string | undefined) ?? "Featured Product";
+            const id = Number(item.id);
+            if (!Number.isFinite(id)) return null;
+            return { id, name: title, image, href: redirectUrl };
+        })
+        .filter((item): item is ProductItem => item !== null);
+
+    return { sectionTitle, redirectUrl, products };
+}
 
 function ProductCard({
     product,
@@ -56,7 +102,7 @@ function ProductCard({
           ${showHoverAsActive ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100"}`}
                 >
                     <Link
-                        href={`/product/${product.id}`}
+                        href={product.href}
                         className="flex h-14 w-full items-center justify-center rounded-none border border-white bg-white py-6 text-[10px] font-black uppercase tracking-[0.3em] text-black transition-all duration-500 md:h-16 md:bg-transparent md:text-[13px] md:text-white md:group-hover:bg-white md:group-hover:text-black"
                     >
                         Quick View
@@ -92,7 +138,16 @@ const staggerItem = {
 
 export default function FeaturedProducts() {
     const [isMobile, setIsMobile] = useState(false);
-    const products = FEATURED_PRODUCTS;
+    const { data: spotlightData } = useQuery({
+        queryKey: ["spotlight-sections", "featured-products"],
+        queryFn: async () => {
+            const response = await getSpotlightSections();
+            return normalizeFeaturedProducts(response);
+        },
+    });
+    const products = spotlightData?.products ?? [];
+    const sectionTitle = spotlightData?.sectionTitle ?? "Curated Selection";
+    const sectionRedirectUrl = spotlightData?.redirectUrl ?? "/women/new-arrival";
 
     useEffect(() => {
         const mq = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
@@ -113,7 +168,7 @@ export default function FeaturedProducts() {
                     transition={{ duration: 0.8 }}
                     className="mb-4 block text-[10px] font-bold uppercase tracking-[0.5em] text-zinc-500 md:text-[12px]"
                 >
-                    Curated Selection
+                    Timeless Pieces
                 </motion.span>
                 <motion.h2
                     initial="hidden"
@@ -123,7 +178,7 @@ export default function FeaturedProducts() {
                     transition={{ duration: 1 }}
                     className="text-5xl font-black uppercase tracking-tighter text-white md:text-7xl"
                 >
-                    FEATURED PIECES
+                    {sectionTitle}
                 </motion.h2>
             </div>
 
@@ -180,7 +235,7 @@ export default function FeaturedProducts() {
 
             <div className="mt-20 flex justify-center">
                 <Link
-                    href="/women/new-arrival"
+                    href={sectionRedirectUrl}
                     className="inline-flex rounded-none border border-zinc-700 px-12 py-7 text-[11px] font-bold uppercase tracking-widest text-white transition-all duration-500 hover:bg-white hover:text-black"
                 >
                     View Full Collection
