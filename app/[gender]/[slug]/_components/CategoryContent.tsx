@@ -81,6 +81,9 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
 
     const products = useMemo(() => data?.pages.flatMap((p) => p.products) ?? [], [data]);
 
+    const totalItemCount =
+        (data?.pages[0]?.pagination as { total?: number } | null | undefined)?.total ?? 0;
+
     const sidebarCategories = useMemo(
         () => apiCategories.filter((c) => c.sex_degree === sexDegree),
         [apiCategories, sexDegree]
@@ -254,7 +257,7 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
 
                         <div className="flex items-end justify-between md:items-center">
                             <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 md:text-[11px]">
-                                Total: {products.length} <span className="hidden sm:inline">Items</span>
+                                Total: {totalItemCount} <span className="hidden sm:inline">Items</span>
                             </p>
 
                             <div className="relative">
