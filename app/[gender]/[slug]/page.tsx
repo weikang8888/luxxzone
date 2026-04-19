@@ -4,6 +4,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import CategoryContent, { nameToSlug } from "./_components/CategoryContent";
 import { useCategories } from "@/app/hooks/useCategories";
+import { categoryMatchesGender } from "@/lib/categoryGender";
 
 export default function CategoryPage() {
     const params = useParams();
@@ -19,7 +20,9 @@ export default function CategoryPage() {
     useEffect(() => {
         if (!subParam || !isFetched || apiCategories.length === 0) return;
         const subId = parseInt(subParam, 10);
-        const category = apiCategories.find((c) => c.sex_degree === sexDegree && nameToSlug(c.name) === slug);
+        const category = apiCategories.find(
+            (c) => categoryMatchesGender(c.sex_degree, sexDegree) && nameToSlug(c.name) === slug
+        );
         const sub = category?.sub_categories.find((s) => s.id === subId);
         if (sub) {
             const rest = new URLSearchParams(searchParams.toString());

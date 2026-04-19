@@ -3,12 +3,14 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Menu, Search, X } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
 import MobileMenu from "./MobileMenu";
 import { useCategories } from "@/app/hooks/useCategories";
 import { useProductSearch } from "@/app/hooks/useProductSearch";
 import { PLACEHOLDER_IMAGE } from "@/lib/constants";
+import { categoryMatchesGender } from "@/lib/categoryGender";
+import { isCategoryHrefActive } from "@/lib/navHref";
 
 type ApiCategory = { id: number; name: string; sex_degree: number; sub_categories: { id: number; name: string }[] };
 type NavCategory = { id: number; label: string; slug: string; sub_categories: { id: number; label: string; href: string }[] };
@@ -17,9 +19,9 @@ function nameToSlug(name: string) {
     return name.toLowerCase().replace(/\s+/g, "-");
 }
 
-function apiToNavCategories(data: ApiCategory[], sexDegree: number, gender: "men" | "women"): NavCategory[] {
+function apiToNavCategories(data: ApiCategory[], sexDegree: 1 | 2, gender: "men" | "women"): NavCategory[] {
     return data
-        .filter((c) => c.sex_degree === sexDegree)
+        .filter((c) => categoryMatchesGender(c.sex_degree, sexDegree))
         .map((c) => {
             const slug = nameToSlug(c.name);
             const baseHref = `/${gender}/${slug}`;
@@ -37,6 +39,7 @@ function apiToNavCategories(data: ApiCategory[], sexDegree: number, gender: "men
 
 export default function Header() {
     const router = useRouter();
+    const pathname = usePathname();
     const params = useParams();
     const searchParams = useSearchParams();
 
@@ -60,6 +63,33 @@ export default function Header() {
     const [debouncedKeyword, setDebouncedKeyword] = useState("");
 
     const { data: searchResult, isLoading: isSearching } = useProductSearch(debouncedKeyword, sexDegree);
+
+    /** Categories in search panel: keyword matches, plus current route category so active styling can show. */
+    const searchPanelCategories = useMemo(() => {
+        const kw = debouncedKeyword.toLowerCase();
+        let list = categories.filter((c) => c.label.toLowerCase().includes(kw));
+        const currentCat = categories.find((c) =>
+            isCategoryHrefActive(pathname, `/${activeGender}/${c.slug}`)
+        );
+        if (currentCat && !list.some((c) => c.id === currentCat.id)) {
+            list = [currentCat, ...list];
+        }
+        return list;
+    }, [categories, debouncedKeyword, pathname, activeGender]);
+
+    /** Sub-categories in search panel: keyword matches, plus current page sub so active styling can show. */
+    const searchPanelSubs = useMemo(() => {
+        const allSubs = categories
+            .flatMap((c) => c.sub_categories)
+            .filter((s) => s.label !== "Shop All");
+        const kw = debouncedKeyword.toLowerCase();
+        let list = allSubs.filter((s) => s.label.toLowerCase().includes(kw));
+        const currentSub = allSubs.find((s) => s.href === pathname);
+        if (currentSub && !list.some((s) => s.href === currentSub.href)) {
+            list = [currentSub, ...list];
+        }
+        return list.slice(0, 8);
+    }, [categories, debouncedKeyword, pathname]);
 
     useEffect(() => {
         if (!searchKeyword.trim()) {
@@ -92,9 +122,14 @@ export default function Header() {
         if (!categorySlug) return;
         const subSlug = typeof params.subSlug === "string" ? params.subSlug : "";
         const sexDegree = gender === "men" ? 1 : 2;
-        const mainCat = apiCategories.find((c) => c.sex_degree === (activeGender === "men" ? 1 : 2) && nameToSlug(c.name) === categorySlug);
+        const activeSexDegree = activeGender === "men" ? 1 : 2;
+        const mainCat = apiCategories.find(
+            (c) => categoryMatchesGender(c.sex_degree, activeSexDegree) && nameToSlug(c.name) === categorySlug
+        );
         const currentSub = mainCat?.sub_categories.find((s) => nameToSlug(s.name) === subSlug);
-        const targetParent = apiCategories.find((c) => c.sex_degree === sexDegree && nameToSlug(c.name) === categorySlug);
+        const targetParent = apiCategories.find(
+            (c) => categoryMatchesGender(c.sex_degree, sexDegree) && nameToSlug(c.name) === categorySlug
+        );
         if (targetParent) {
             const targetSub = currentSub && targetParent.sub_categories.find((s) => s.name === currentSub.name);
             const path = targetSub
@@ -114,6 +149,7 @@ export default function Header() {
                 activeGender={activeGender}
                 onGenderSwitch={handleGenderSwitch}
                 categories={categories}
+                pathname={pathname}
             />
 
             {/* --- 2. Search Overlay (极速响应版) --- */}
@@ -162,14 +198,21 @@ export default function Header() {
                                 <div className="space-y-6">
                                     <p className={`text-[9px] font-black uppercase tracking-[0.5em] italic ${isScrolled ? "text-zinc-700" : "text-zinc-300"}`}>Categories</p>
                                     <div className="flex flex-col gap-4">
-                                        {categories
-                                            .filter(c => c.label.toLowerCase().includes(debouncedKeyword.toLowerCase()))
-                                            .map(cat => (
-                                                <Link key={cat.id} href={`/${activeGender}/${cat.slug}`} onClick={() => setIsSearchOpen(false)}
-                                                    className="text-2xl font-black uppercase tracking-tighter hover:italic transition-all leading-none">
-                                                    {cat.label}
-                                                </Link>
-                                            ))}
+                                        {searchPanelCategories.map(cat => {
+                                                const catHref = `/${activeGender}/${cat.slug}`;
+                                                const isActive = isCategoryHrefActive(pathname, catHref);
+                                                return (
+                                                    <Link
+                                                        key={cat.id}
+                                                        href={catHref}
+                                                        onClick={() => setIsSearchOpen(false)}
+                                                        aria-current={isActive ? "page" : undefined}
+                                                        className={`text-2xl font-black uppercase tracking-tighter hover:italic transition-all leading-none ${isActive ? (isScrolled ? "italic text-white" : "italic text-black") : ""}`}
+                                                    >
+                                                        {cat.label}
+                                                    </Link>
+                                                );
+                                            })}
                                     </div>
                                 </div>
 
@@ -177,16 +220,27 @@ export default function Header() {
                                 <div className="space-y-6">
                                     <p className={`text-[9px] font-black uppercase tracking-[0.5em] italic ${isScrolled ? "text-zinc-700" : "text-zinc-300"}`}>Sub-categories</p>
                                     <div className="flex flex-wrap md:flex-col gap-2 md:gap-4">
-                                        {categories.flatMap(c => c.sub_categories)
-                                            .filter(s => s.label.toLowerCase().includes(debouncedKeyword.toLowerCase()) && s.label !== "Shop All")
-                                            .slice(0, 8)
-                                            .map(sub => (
-                                                <Link key={sub.id} href={sub.href} onClick={() => setIsSearchOpen(false)}
-                                                    className={`text-[10px] md:text-[13px] font-bold uppercase tracking-[0.2em] border px-3 py-1.5 md:border-none md:p-0 transition-colors ${isScrolled ? "border-zinc-800 text-zinc-500 hover:text-white" : "border-zinc-100 text-zinc-400 hover:text-black"
-                                                        }`}>
-                                                    {sub.label}
-                                                </Link>
-                                            ))}
+                                        {searchPanelSubs.map(sub => {
+                                                const isActive = pathname === sub.href;
+                                                return (
+                                                    <Link
+                                                        key={`${sub.href}-${sub.id}`}
+                                                        href={sub.href}
+                                                        onClick={() => setIsSearchOpen(false)}
+                                                        aria-current={isActive ? "page" : undefined}
+                                                        className={`text-[10px] md:text-[13px] font-bold uppercase tracking-[0.2em] border px-3 py-1.5 md:border-none md:p-0 transition-colors ${isActive
+                                                            ? isScrolled
+                                                                ? "border-white text-white md:border-b md:border-white md:pb-0.5"
+                                                                : "border-black text-black md:border-b md:border-black md:pb-0.5"
+                                                            : isScrolled
+                                                                ? "border-zinc-800 text-zinc-500 hover:text-white"
+                                                                : "border-zinc-100 text-zinc-400 hover:text-black"
+                                                            }`}
+                                                    >
+                                                        {sub.label}
+                                                    </Link>
+                                                );
+                                            })}
                                     </div>
                                 </div>
                             </div>
@@ -256,16 +310,30 @@ export default function Header() {
 
                 <div className={`hidden border-t md:block transition-all duration-500 ${isScrolled ? "border-zinc-800/50" : "border-zinc-100"}`}>
                     <nav className="mx-auto flex h-14 max-w-5xl items-center justify-center gap-12">
-                        {categories.map((item) => (
-                            <Link
-                                key={item.id}
-                                href={`/${activeGender}/${item.slug}`}
-                                className={`group relative text-[12px] font-black uppercase tracking-[0.15em] transition-colors ${isScrolled ? "text-zinc-400 hover:text-white" : "text-zinc-500 hover:text-black"}`}
-                            >
-                                {item.label}
-                                <span className={`absolute -bottom-1 left-0 h-px w-0 transition-all duration-300 group-hover:w-full ${isScrolled ? "bg-white" : "bg-black"}`} />
-                            </Link>
-                        ))}
+                        {categories.map((item) => {
+                            const catHref = `/${activeGender}/${item.slug}`;
+                            const isActive = isCategoryHrefActive(pathname, catHref);
+                            return (
+                                <Link
+                                    key={item.id}
+                                    href={catHref}
+                                    aria-current={isActive ? "page" : undefined}
+                                    className={`group relative text-[12px] font-black uppercase tracking-[0.15em] transition-colors ${isActive
+                                        ? isScrolled
+                                            ? "text-white"
+                                            : "text-black"
+                                        : isScrolled
+                                            ? "text-zinc-400 hover:text-white"
+                                            : "text-zinc-500 hover:text-black"
+                                        }`}
+                                >
+                                    {item.label}
+                                    <span
+                                        className={`absolute -bottom-1 left-0 h-px transition-all duration-300 ${isActive ? "w-full" : "w-0 group-hover:w-full"} ${isScrolled ? "bg-white" : "bg-black"}`}
+                                    />
+                                </Link>
+                            );
+                        })}
                     </nav>
                 </div>
             </div>

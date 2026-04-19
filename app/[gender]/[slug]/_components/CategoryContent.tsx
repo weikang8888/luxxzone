@@ -7,6 +7,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, MessageCircle } from "lucide-react";
 import { PLACEHOLDER_IMAGE, WHATSAPP_NUMBER } from "@/lib/constants";
+import { categoryMatchesGender } from "@/lib/categoryGender";
 import { useCategories } from "@/app/hooks/useCategories";
 import { useProductListInfinite } from "@/app/hooks/useProductListInfinite";
 
@@ -50,7 +51,10 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
 
     const sexDegree = gender === "men" ? 1 : 2;
     const currentCategory = useMemo(
-        () => apiCategories.find((c) => c.sex_degree === sexDegree && nameToSlug(c.name) === slug),
+        () =>
+            apiCategories.find(
+                (c) => categoryMatchesGender(c.sex_degree, sexDegree) && nameToSlug(c.name) === slug
+            ),
         [apiCategories, sexDegree, slug]
     );
 
@@ -85,7 +89,7 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
         (data?.pages[0]?.pagination as { total?: number } | null | undefined)?.total ?? 0;
 
     const sidebarCategories = useMemo(
-        () => apiCategories.filter((c) => c.sex_degree === sexDegree),
+        () => apiCategories.filter((c) => categoryMatchesGender(c.sex_degree, sexDegree)),
         [apiCategories, sexDegree]
     );
 

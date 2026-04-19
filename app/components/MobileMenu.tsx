@@ -6,6 +6,7 @@ import { X, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { WHATSAPP_NUMBER } from "@/lib/constants";
+import { isCategoryHrefActive } from "@/lib/navHref";
 
 type NavCategory = { id: number; label: string; slug: string; sub_categories: { id: number; label: string; href: string }[] };
 
@@ -24,9 +25,10 @@ type Props = {
     activeGender: "men" | "women";
     onGenderSwitch: (gender: "men" | "women") => void;
     categories: NavCategory[];
+    pathname: string;
 };
 
-export default function MobileMenu({ isOpen, onClose, activeGender, onGenderSwitch, categories }: Props) {
+export default function MobileMenu({ isOpen, onClose, activeGender, onGenderSwitch, categories, pathname }: Props) {
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
     useEffect(() => {
@@ -75,6 +77,8 @@ export default function MobileMenu({ isOpen, onClose, activeGender, onGenderSwit
                     {categories.map((item, idx) => {
                         const hasSubItems = item.sub_categories.length > 0;
                         const isExpanded = openDropdown === item.label;
+                        const catHref = `/${activeGender}/${item.slug}`;
+                        const isCatActive = isCategoryHrefActive(pathname, catHref);
 
                         if (hasSubItems) {
                             return (
@@ -91,7 +95,7 @@ export default function MobileMenu({ isOpen, onClose, activeGender, onGenderSwit
                                         className="flex w-full items-center justify-between py-6 outline-none text-left"
                                         onClick={() => setOpenDropdown(isExpanded ? null : item.label)}
                                     >
-                                        <span className={`text-xl font-black uppercase tracking-tighter transition-colors ${isExpanded ? "text-black" : "text-zinc-950"}`}>
+                                        <span className={`text-xl font-black uppercase tracking-tighter transition-colors ${isExpanded || isCatActive ? "text-black" : "text-zinc-950"}`}>
                                             {item.label}
                                         </span>
                                         <ChevronRight className={`size-4 text-zinc-300 transition-transform duration-300 ${isExpanded ? "rotate-90" : ""}`} />
@@ -99,16 +103,20 @@ export default function MobileMenu({ isOpen, onClose, activeGender, onGenderSwit
                                     <div className={`grid transition-all duration-300 ease-out ${isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
                                         <div className="overflow-hidden">
                                             <div className="flex flex-wrap gap-x-6 gap-y-4 pb-6 pl-0">
-                                                {item.sub_categories.map((sub) => (
-                                                    <Link
-                                                        key={sub.id}
-                                                        href={sub.href}
-                                                        className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:text-black"
-                                                        onClick={onClose}
-                                                    >
-                                                        {sub.label}
-                                                    </Link>
-                                                ))}
+                                                {item.sub_categories.map((sub) => {
+                                                    const isSubActive = pathname === sub.href;
+                                                    return (
+                                                        <Link
+                                                            key={sub.id}
+                                                            href={sub.href}
+                                                            aria-current={isSubActive ? "page" : undefined}
+                                                            className={`text-[10px] font-bold uppercase tracking-widest ${isSubActive ? "text-black underline underline-offset-4" : "text-zinc-400 hover:text-black"}`}
+                                                            onClick={onClose}
+                                                        >
+                                                            {sub.label}
+                                                        </Link>
+                                                    );
+                                                })}
                                             </div>
                                         </div>
                                     </div>
@@ -125,11 +133,12 @@ export default function MobileMenu({ isOpen, onClose, activeGender, onGenderSwit
                                 variants={menuVariants}
                             >
                                 <Link
-                                    href={`/${activeGender}/${item.slug}`}
+                                    href={catHref}
                                     onClick={onClose}
+                                    aria-current={isCatActive ? "page" : undefined}
                                     className="flex items-center justify-between border-b border-zinc-100 py-6"
                                 >
-                                    <span className="text-xl font-black uppercase tracking-tighter text-black">{item.label}</span>
+                                    <span className={`text-xl font-black uppercase tracking-tighter ${isCatActive ? "text-black underline underline-offset-8" : "text-black"}`}>{item.label}</span>
                                 </Link>
                             </motion.div>
                         );

@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { useCategories } from "@/app/hooks/useCategories";
 import CategoryContent, { nameToSlug } from "../_components/CategoryContent";
+import { categoryMatchesGender } from "@/lib/categoryGender";
 
 export default function SubCategoryPage() {
     const params = useParams();
@@ -16,7 +17,9 @@ export default function SubCategoryPage() {
     const sexDegree = gender === "men" ? 1 : 2;
 
     const isValidSub = useMemo(() => {
-        const category = apiCategories.find((c) => c.sex_degree === sexDegree && nameToSlug(c.name) === slug);
+        const category = apiCategories.find(
+            (c) => categoryMatchesGender(c.sex_degree, sexDegree) && nameToSlug(c.name) === slug
+        );
         if (!category) return false;
         return category.sub_categories.some((s) => nameToSlug(s.name) === subSlug);
     }, [apiCategories, sexDegree, slug, subSlug]);
