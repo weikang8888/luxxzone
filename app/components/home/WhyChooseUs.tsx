@@ -12,10 +12,10 @@ const MOBILE_BREAKPOINT = 1024;
 const pillars = [
   {
     icon: Shield,
-    label: "Authentic Products",
-    description: "Every item is verified for authenticity. Shop with confidence knowing you're getting genuine luxury.",
+    label: "CURATED QUALITY",
+    description: "Each piece is carefully selected and inspected, ensuring exceptional craftsmanship and refined detail.",
     image: "https://images.unsplash.com/photo-1558171813-4c088753af8f?q=80&w=800&auto=format&fit=crop",
-    alt: "Authentic luxury products",
+    alt: "Premium replica fashion quality",
   },
   {
     icon: CreditCard,
@@ -149,13 +149,13 @@ export default function WhyChooseUs() {
         >
           {isMobile ? (
             <div className="overflow-x-clip -mx-6 px-6">
-            <Swiper slidesPerView={1.2} spaceBetween={16} className="!overflow-visible">
-              {pillars.map((pillar) => (
-                <SwiperSlide key={pillar.label}>
-                  <PillarCard {...pillar} isActive={true} />
-                </SwiperSlide>
-              ))}
-            </Swiper>
+              <Swiper slidesPerView={1.2} spaceBetween={16} className="!overflow-visible">
+                {pillars.map((pillar) => (
+                  <SwiperSlide key={pillar.label}>
+                    <PillarCard {...pillar} isActive={true} />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
             </div>
           ) : (
             <div className="grid grid-cols-4 gap-2">
