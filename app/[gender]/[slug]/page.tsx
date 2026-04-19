@@ -2,7 +2,8 @@
 
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
-import CategoryContent, { nameToSlug } from "./_components/CategoryContent";
+import CategoryContent from "./_components/CategoryContent";
+import { nameToSlug } from "@/lib/nameToSlug";
 import { useCategories } from "@/app/hooks/useCategories";
 import { categoryMatchesGender } from "@/lib/categoryGender";
 

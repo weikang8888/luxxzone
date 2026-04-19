@@ -3,7 +3,8 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { useCategories } from "@/app/hooks/useCategories";
-import CategoryContent, { nameToSlug } from "../_components/CategoryContent";
+import CategoryContent from "../_components/CategoryContent";
+import { nameToSlug } from "@/lib/nameToSlug";
 import { categoryMatchesGender } from "@/lib/categoryGender";
 
 export default function SubCategoryPage() {

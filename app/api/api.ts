@@ -5,10 +5,20 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.luxxzo
 export async function showProductList(
   category_id: number,
   sex_degree: number,
-  options?: { sub_category_id?: number; page?: number; limit?: number; keyword?: string; sort_title?: number; sort_best_selling?: number; sort_new?: number }
+  options?: {
+    sub_category_id?: number;
+    sub_sub_category_id?: number;
+    page?: number;
+    limit?: number;
+    keyword?: string;
+    sort_title?: number;
+    sort_best_selling?: number;
+    sort_new?: number;
+  }
 ) {
   const params: Record<string, string | number> = { category_id, sex_degree };
   if (options?.sub_category_id != null) params.sub_category_id = options.sub_category_id;
+  if (options?.sub_sub_category_id != null) params.sub_sub_category_id = options.sub_sub_category_id;
   if (options?.page != null) params.page = options.page;
   if (options?.limit != null) params.limit = options.limit;
   if (options?.keyword) params.keyword = options.keyword;

@@ -33,16 +33,35 @@ function mapProduct(p: Record<string, unknown>) {
 export function useProductListInfinite(
     category_id: number | undefined,
     sex_degree: number,
-    options?: { sub_category_id?: number; limit?: number; sort_title?: number; sort_best_selling?: number; sort_new?: number }
+    options?: {
+    sub_category_id?: number;
+    sub_sub_category_id?: number;
+    limit?: number;
+    sort_title?: number;
+    sort_best_selling?: number;
+    sort_new?: number;
+  }
 ) {
     const limit = options?.limit ?? DEFAULT_LIMIT;
 
     return useInfiniteQuery({
-        queryKey: ["products", "infinite", category_id, sex_degree, options?.sub_category_id ?? null, limit, options?.sort_title, options?.sort_best_selling, options?.sort_new],
+        queryKey: [
+            "products",
+            "infinite",
+            category_id,
+            sex_degree,
+            options?.sub_category_id ?? null,
+            options?.sub_sub_category_id ?? null,
+            limit,
+            options?.sort_title,
+            options?.sort_best_selling,
+            options?.sort_new,
+        ],
         queryFn: async ({ pageParam }) => {
             if (category_id == null) return { products: [], pagination: null };
             const res = await showProductList(category_id, sex_degree, {
                 sub_category_id: options?.sub_category_id,
+                sub_sub_category_id: options?.sub_sub_category_id,
                 page: pageParam,
                 limit,
                 sort_title: options?.sort_title,

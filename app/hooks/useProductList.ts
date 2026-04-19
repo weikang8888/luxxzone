@@ -16,17 +16,18 @@ function getProductImage(p: Record<string, unknown>): string {
 export function useProductList(
     category_id: number | undefined,
     sex_degree: number,
-    options?: { sub_category_id?: number; page?: number; limit?: number }
+    options?: { sub_category_id?: number; sub_sub_category_id?: number; page?: number; limit?: number }
 ) {
     const page = options?.page ?? DEFAULT_PAGE;
     const limit = options?.limit ?? DEFAULT_LIMIT;
 
     return useQuery({
-        queryKey: ["products", category_id, sex_degree, options?.sub_category_id ?? null, page, limit],
+        queryKey: ["products", category_id, sex_degree, options?.sub_category_id ?? null, options?.sub_sub_category_id ?? null, page, limit],
         queryFn: async () => {
             if (category_id == null) return [];
             const res = await showProductList(category_id, sex_degree, {
                 sub_category_id: options?.sub_category_id,
+                sub_sub_category_id: options?.sub_sub_category_id,
                 page,
                 limit,
             });

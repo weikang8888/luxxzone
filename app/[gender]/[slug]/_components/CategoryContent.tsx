@@ -8,12 +8,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, MessageCircle } from "lucide-react";
 import { PLACEHOLDER_IMAGE, productCanonicalUrl, whatsappPurchaseInquiryHref } from "@/lib/constants";
 import { categoryMatchesGender } from "@/lib/categoryGender";
+import { nameToSlug } from "@/lib/nameToSlug";
 import { useCategories } from "@/app/hooks/useCategories";
 import { useProductListInfinite } from "@/app/hooks/useProductListInfinite";
-
-export function nameToSlug(name: string) {
-    return name.toLowerCase().replace(/\s+/g, "-");
-}
 
 const sortOptions: { label: string; value: string; sort_title?: number; sort_best_selling?: number; sort_new?: number }[] = [
     { label: "Default", value: "default" },
@@ -29,9 +26,10 @@ type Props = {
     gender: "men" | "women";
     slug: string;
     subSlug?: string;
+    subSubSlug?: string;
 };
 
-export default function CategoryContent({ gender, slug, subSlug }: Props) {
+export default function CategoryContent({ gender, slug, subSlug, subSubSlug }: Props) {
     const searchParams = useSearchParams();
     const router = useRouter();
 
@@ -39,6 +37,8 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
     const [currentSort, setCurrentSort] = useState("default");
     const [expandedCatIds, setExpandedCatIds] = useState<Set<number>>(new Set());
     const [collapsedCatIds, setCollapsedCatIds] = useState<Set<number>>(new Set());
+    /** Sub-rows that have sub_sub_categories: toggle brand dropdown (`${categoryId}-${subId}`). */
+    const [openSubDropdownIds, setOpenSubDropdownIds] = useState<Set<string>>(new Set());
 
     const limit = 12;
     const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -63,6 +63,12 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
         return currentCategory.sub_categories.find((s) => nameToSlug(s.name) === subSlug);
     }, [currentCategory, subSlug]);
 
+    const subSubCategory = useMemo(() => {
+        if (!subSubSlug || !subCategory) return undefined;
+        const triples = subCategory.sub_sub_categories ?? [];
+        return triples.find((ss) => nameToSlug(ss.name) === subSubSlug);
+    }, [subCategory, subSubSlug]);
+
     const sub_category_id = subCategory?.id;
 
     const selectedSort = sortOptions.find((o) => o.value === currentSort);
@@ -79,6 +85,7 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
         isFetchingNextPage,
     } = useProductListInfinite(currentCategory?.id, sexDegree, {
         sub_category_id,
+        sub_sub_category_id: subSubCategory?.id,
         limit,
         ...sortParams,
     });
@@ -93,7 +100,11 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
         [apiCategories, sexDegree]
     );
 
-    const basePath = subSlug ? `/${gender}/${slug}/${subSlug}` : `/${gender}/${slug}`;
+    const basePath = useMemo(() => {
+        if (subSubSlug && subSlug) return `/${gender}/${slug}/${subSlug}/${subSubSlug}`;
+        if (subSlug) return `/${gender}/${slug}/${subSlug}`;
+        return `/${gender}/${slug}`;
+    }, [gender, slug, subSlug, subSubSlug]);
 
     useEffect(() => {
         if (!hasNextPage || isFetchingNextPage) return;
@@ -116,6 +127,25 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
         setIsSortOpen(false);
     };
 
+    const toggleSubBrandDropdown = (panelKey: string) => {
+        setOpenSubDropdownIds((prev) => {
+            const next = new Set(prev);
+            if (next.has(panelKey)) next.delete(panelKey);
+            else next.add(panelKey);
+            return next;
+        });
+    };
+
+    /** Expand the brand dropdown when URL is on a sub-sub route. */
+    useEffect(() => {
+        if (!subSlug || !subSubSlug || !currentCategory) return;
+        const sub = currentCategory.sub_categories.find((s) => nameToSlug(s.name) === subSlug);
+        const triples = sub?.sub_sub_categories ?? [];
+        if (!sub || triples.length === 0) return;
+        const key = `${currentCategory.id}-${sub.id}`;
+        setOpenSubDropdownIds((prev) => new Set(prev).add(key));
+    }, [subSlug, subSubSlug, currentCategory]);
+
     const toggleSidebarCategory = (catId: number, catSlug: string) => {
         const isCurrentCategory = slug === catSlug;
         if (isCurrentCategory) {
@@ -135,9 +165,11 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
         }
     };
 
-    const displayTitle = subCategory
-        ? subCategory.name
-        : slug.replace(/-/g, " ");
+    const displayTitle = subSubCategory
+        ? subSubCategory.name
+        : subCategory
+            ? subCategory.name
+            : slug.replace(/-/g, " ");
 
     const breadcrumb = currentCategory
         ? `Luxxzone / ${gender} / ${currentCategory.name}`
@@ -227,16 +259,135 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
                                                             </motion.div>
                                                             {cat.sub_categories.map((sub) => {
                                                                 const subHref = `/${gender}/${catSlug}/${nameToSlug(sub.name)}`;
-                                                                const isActive = slug === catSlug && sub_category_id === sub.id;
-                                                                return (
-                                                                    <motion.div key={sub.id} variants={{ hidden: { opacity: 0, x: -8 }, visible: { opacity: 1, x: 0 } }}>
-                                                                        <Link
-                                                                            href={subHref}
-                                                                            className={`text-[10px] font-bold uppercase tracking-widest md:text-[11px] ${isActive ? "text-black" : "text-zinc-400 hover:text-black"}`}
+                                                                const triples = sub.sub_sub_categories ?? [];
+                                                                if (triples.length === 0) {
+                                                                    const isActive =
+                                                                        slug === catSlug &&
+                                                                        sub_category_id === sub.id &&
+                                                                        !subSubSlug;
+                                                                    return (
+                                                                        <motion.div
+                                                                            key={sub.id}
+                                                                            variants={{ hidden: { opacity: 0, x: -8 }, visible: { opacity: 1, x: 0 } }}
                                                                         >
-                                                                            {sub.name}
-                                                                        </Link>
-                                                                    </motion.div>
+                                                                            <Link
+                                                                                href={subHref}
+                                                                                className={`text-[10px] font-bold uppercase tracking-widest md:text-[11px] ${isActive ? "text-black" : "text-zinc-400 hover:text-black"}`}
+                                                                            >
+                                                                                {sub.name}
+                                                                            </Link>
+                                                                        </motion.div>
+                                                                    );
+                                                                }
+                                                                const parentActive =
+                                                                    slug === catSlug &&
+                                                                    sub_category_id === sub.id &&
+                                                                    (!subSubSlug ||
+                                                                        triples.some(
+                                                                            (ss) =>
+                                                                                nameToSlug(ss.name) ===
+                                                                                subSubSlug
+                                                                        ));
+                                                                const subPanelKey = `${cat.id}-${sub.id}`;
+                                                                const isBrandDropdownOpen =
+                                                                    openSubDropdownIds.has(subPanelKey);
+                                                                return (
+                                                                    <div key={sub.id} className="flex flex-col">
+                                                                        <motion.div
+                                                                            variants={{
+                                                                                hidden: { opacity: 0, x: -8 },
+                                                                                visible: { opacity: 1, x: 0 },
+                                                                            }}
+                                                                            className="flex items-start justify-between gap-1"
+                                                                        >
+                                                                            <Link
+                                                                                href={subHref}
+                                                                                className={`min-w-0 flex-1 text-[10px] font-bold uppercase tracking-widest md:text-[11px] ${parentActive ? "text-black" : "text-zinc-400 hover:text-black"}`}
+                                                                            >
+                                                                                {sub.name}
+                                                                            </Link>
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={(e) => {
+                                                                                    e.preventDefault();
+                                                                                    toggleSubBrandDropdown(subPanelKey);
+                                                                                }}
+                                                                                aria-expanded={isBrandDropdownOpen}
+                                                                                aria-label={
+                                                                                    isBrandDropdownOpen
+                                                                                        ? "Collapse brands"
+                                                                                        : "Expand brands"
+                                                                                }
+                                                                                className="-m-1 shrink-0 cursor-pointer p-1 text-zinc-400 transition-colors hover:text-black"
+                                                                            >
+                                                                                <motion.span
+                                                                                    animate={{
+                                                                                        rotate: isBrandDropdownOpen
+                                                                                            ? 180
+                                                                                            : 0,
+                                                                                    }}
+                                                                                    transition={{
+                                                                                        duration: 0.25,
+                                                                                        ease: "easeInOut",
+                                                                                    }}
+                                                                                    className="block"
+                                                                                >
+                                                                                    <ChevronDown className="size-[14px] md:size-4" />
+                                                                                </motion.span>
+                                                                            </button>
+                                                                        </motion.div>
+                                                                        <AnimatePresence initial={false}>
+                                                                            {isBrandDropdownOpen && (
+                                                                                <motion.div
+                                                                                    key={`brands-${subPanelKey}`}
+                                                                                    initial={{
+                                                                                        height: 0,
+                                                                                        opacity: 0,
+                                                                                    }}
+                                                                                    animate={{
+                                                                                        height: "auto",
+                                                                                        opacity: 1,
+                                                                                    }}
+                                                                                    exit={{
+                                                                                        height: 0,
+                                                                                        opacity: 0,
+                                                                                    }}
+                                                                                    transition={{
+                                                                                        duration: 0.28,
+                                                                                        ease: [
+                                                                                            0.25, 0.46, 0.45,
+                                                                                            0.94,
+                                                                                        ],
+                                                                                    }}
+                                                                                    className="overflow-hidden"
+                                                                                >
+                                                                                    <div className="mt-3 flex flex-col gap-3 border-l border-zinc-100 py-1 pl-3">
+                                                                                        {triples.map((ss) => {
+                                                                                            const ssHref = `${subHref}/${nameToSlug(ss.name)}`;
+                                                                                            const ssSlug =
+                                                                                                nameToSlug(ss.name);
+                                                                                            const isSsActive =
+                                                                                                slug ===
+                                                                                                    catSlug &&
+                                                                                                sub_category_id ===
+                                                                                                    sub.id &&
+                                                                                                subSubSlug ===
+                                                                                                    ssSlug;
+                                                                                            return (
+                                                                                                <Link
+                                                                                                    key={ss.id}
+                                                                                                    href={ssHref}
+                                                                                                    className={`text-[10px] font-bold uppercase tracking-widest md:text-[11px] ${isSsActive ? "text-black" : "text-zinc-400 hover:text-black"}`}
+                                                                                                >
+                                                                                                    {ss.name}
+                                                                                                </Link>
+                                                                                            );
+                                                                                        })}
+                                                                                    </div>
+                                                                                </motion.div>
+                                                                            )}
+                                                                        </AnimatePresence>
+                                                                    </div>
                                                                 );
                                                             })}
                                                         </motion.div>

@@ -2,13 +2,12 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { X, ChevronRight } from "lucide-react";
+import { X, ChevronRight, ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { WHATSAPP_NUMBER } from "@/lib/constants";
+import type { NavCategory } from "@/lib/navFromCategories";
 import { isCategoryHrefActive } from "@/lib/navHref";
-
-type NavCategory = { id: number; label: string; slug: string; sub_categories: { id: number; label: string; href: string }[] };
 
 const menuVariants = {
     hidden: { opacity: 0, x: -20 },
@@ -30,10 +29,33 @@ type Props = {
 
 export default function MobileMenu({ isOpen, onClose, activeGender, onGenderSwitch, categories, pathname }: Props) {
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+    /** Which sub row’s brand dropdown is open (`${categoryId}-${subId}`). Only applies when sub has `children`. */
+    const [openSubBrandKey, setOpenSubBrandKey] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!isOpen) setOpenDropdown(null);
-    }, [isOpen]);
+        if (!isOpen) {
+            setOpenDropdown(null);
+            setOpenSubBrandKey(null);
+            return;
+        }
+        setOpenSubBrandKey(null);
+        const matchCat = categories.find((c) =>
+            pathname.startsWith(`/${activeGender}/${c.slug}`)
+        );
+        if (matchCat) setOpenDropdown(matchCat.label);
+        else setOpenDropdown(null);
+        for (const c of categories) {
+            const base = `/${activeGender}/${c.slug}`;
+            if (!pathname.startsWith(base)) continue;
+            for (const s of c.sub_categories) {
+                if (s.label === "Shop All" || !s.children?.length) continue;
+                if (pathname === s.href || pathname.startsWith(`${s.href}/`)) {
+                    setOpenSubBrandKey(`${c.id}-${s.id}`);
+                    return;
+                }
+            }
+        }
+    }, [isOpen, pathname, categories, activeGender]);
 
     return (
         <motion.div
@@ -104,17 +126,86 @@ export default function MobileMenu({ isOpen, onClose, activeGender, onGenderSwit
                                         <div className="overflow-hidden">
                                             <div className="flex flex-wrap gap-x-6 gap-y-4 pb-6 pl-0">
                                                 {item.sub_categories.map((sub) => {
-                                                    const isSubActive = pathname === sub.href;
+                                                    if (!sub.children?.length) {
+                                                        const isSubActive = pathname === sub.href;
+                                                        return (
+                                                            <Link
+                                                                key={sub.id}
+                                                                href={sub.href}
+                                                                aria-current={isSubActive ? "page" : undefined}
+                                                                className={`text-[10px] font-bold uppercase tracking-widest ${isSubActive ? "text-black underline underline-offset-4" : "text-zinc-400 hover:text-black"}`}
+                                                                onClick={onClose}
+                                                            >
+                                                                {sub.label}
+                                                            </Link>
+                                                        );
+                                                    }
+                                                    const brandKey = `${item.id}-${sub.id}`;
+                                                    const brandsOpen = openSubBrandKey === brandKey;
+                                                    const isSubLandingActive =
+                                                        pathname === sub.href ||
+                                                        pathname.startsWith(`${sub.href}/`);
                                                     return (
-                                                        <Link
-                                                            key={sub.id}
-                                                            href={sub.href}
-                                                            aria-current={isSubActive ? "page" : undefined}
-                                                            className={`text-[10px] font-bold uppercase tracking-widest ${isSubActive ? "text-black underline underline-offset-4" : "text-zinc-400 hover:text-black"}`}
-                                                            onClick={onClose}
-                                                        >
-                                                            {sub.label}
-                                                        </Link>
+                                                        <div key={sub.id} className="flex w-full flex-col">
+                                                            <div className="flex items-center justify-between gap-3">
+                                                                <Link
+                                                                    href={sub.href}
+                                                                    aria-current={
+                                                                        isSubLandingActive ? "page" : undefined
+                                                                    }
+                                                                    className={`min-w-0 flex-1 text-left text-[10px] font-bold uppercase tracking-widest ${isSubLandingActive ? "text-black underline underline-offset-4" : "text-zinc-400 hover:text-black"}`}
+                                                                    onClick={onClose}
+                                                                >
+                                                                    {sub.label}
+                                                                </Link>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() =>
+                                                                        setOpenSubBrandKey((k) =>
+                                                                            k === brandKey ? null : brandKey
+                                                                        )
+                                                                    }
+                                                                    aria-expanded={brandsOpen}
+                                                                    aria-label={
+                                                                        brandsOpen
+                                                                            ? "Close brand list"
+                                                                            : "Open brand list"
+                                                                    }
+                                                                    className="shrink-0 p-1.5 text-zinc-400 transition-colors hover:text-black"
+                                                                >
+                                                                    <ChevronDown
+                                                                        className={`size-4 transition-transform duration-300 ${brandsOpen ? "rotate-180" : ""}`}
+                                                                    />
+                                                                </button>
+                                                            </div>
+                                                            <div
+                                                                className={`grid transition-[grid-template-rows] duration-300 ease-out ${brandsOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
+                                                            >
+                                                                <div className="min-h-0 overflow-hidden">
+                                                                    <div className="mt-4 flex flex-col gap-3 border-l border-zinc-100 pb-1 pl-4 pt-1">
+                                                                        {sub.children.map((ch) => {
+                                                                            const isChildActive =
+                                                                                pathname === ch.href;
+                                                                            return (
+                                                                                <Link
+                                                                                    key={ch.id}
+                                                                                    href={ch.href}
+                                                                                    aria-current={
+                                                                                        isChildActive
+                                                                                            ? "page"
+                                                                                            : undefined
+                                                                                    }
+                                                                                    className={`text-[10px] font-bold uppercase tracking-widest ${isChildActive ? "text-black underline underline-offset-4" : "text-zinc-400 hover:text-black"}`}
+                                                                                    onClick={onClose}
+                                                                                >
+                                                                                    {ch.label}
+                                                                                </Link>
+                                                                            );
+                                                                        })}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     );
                                                 })}
                                             </div>

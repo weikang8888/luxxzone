@@ -10,32 +10,9 @@ import { useCategories } from "@/app/hooks/useCategories";
 import { useProductSearch } from "@/app/hooks/useProductSearch";
 import { PLACEHOLDER_IMAGE } from "@/lib/constants";
 import { categoryMatchesGender } from "@/lib/categoryGender";
+import { nameToSlug } from "@/lib/nameToSlug";
+import { apiToNavCategories } from "@/lib/navFromCategories";
 import { isCategoryHrefActive } from "@/lib/navHref";
-
-type ApiCategory = { id: number; name: string; sex_degree: number; sub_categories: { id: number; name: string }[] };
-type NavCategory = { id: number; label: string; slug: string; sub_categories: { id: number; label: string; href: string }[] };
-
-function nameToSlug(name: string) {
-    return name.toLowerCase().replace(/\s+/g, "-");
-}
-
-function apiToNavCategories(data: ApiCategory[], sexDegree: 1 | 2, gender: "men" | "women"): NavCategory[] {
-    return data
-        .filter((c) => categoryMatchesGender(c.sex_degree, sexDegree))
-        .map((c) => {
-            const slug = nameToSlug(c.name);
-            const baseHref = `/${gender}/${slug}`;
-            const sub_categories = c.sub_categories.map((sub) => ({
-                id: sub.id,
-                label: sub.name,
-                href: `/${gender}/${slug}/${nameToSlug(sub.name)}`,
-            }));
-            if (sub_categories.length > 0) {
-                sub_categories.unshift({ id: 0, label: "Shop All", href: baseHref });
-            }
-            return { id: c.id, label: c.name, slug, sub_categories };
-        });
-}
 
 export default function Header() {
     const router = useRouter();
@@ -64,6 +41,31 @@ export default function Header() {
 
     const { data: searchResult, isLoading: isSearching } = useProductSearch(debouncedKeyword, sexDegree);
 
+    /** Flattened sub / brand links for longest-prefix active matching on nested URLs. */
+    const flattenedNavSubs = useMemo(() => {
+        type FlatSub = { label: string; href: string };
+        return categories.flatMap((c) =>
+            c.sub_categories.flatMap((s): FlatSub[] => {
+                if (s.label === "Shop All") return [];
+                if (s.children?.length) {
+                    return [
+                        { label: s.label, href: s.href },
+                        ...s.children.map((ch) => ({ label: ch.label, href: ch.href })),
+                    ];
+                }
+                return [{ label: s.label, href: s.href }];
+            })
+        );
+    }, [categories]);
+
+    const searchSubActiveHref = useMemo(() => {
+        const matches = flattenedNavSubs.filter(
+            (s) => pathname === s.href || pathname.startsWith(`${s.href}/`)
+        );
+        if (matches.length === 0) return null;
+        return matches.sort((a, b) => b.href.length - a.href.length)[0]!.href;
+    }, [flattenedNavSubs, pathname]);
+
     /** Categories in search panel: keyword matches, plus current route category so active styling can show. */
     const searchPanelCategories = useMemo(() => {
         const kw = debouncedKeyword.toLowerCase();
@@ -77,19 +79,19 @@ export default function Header() {
         return list;
     }, [categories, debouncedKeyword, pathname, activeGender]);
 
-    /** Sub-categories in search panel: keyword matches, plus current page sub so active styling can show. */
+    /** Sub-categories (and sub-sub brands) in search panel: keyword matches, plus current route row for active styling. */
     const searchPanelSubs = useMemo(() => {
-        const allSubs = categories
-            .flatMap((c) => c.sub_categories)
-            .filter((s) => s.label !== "Shop All");
         const kw = debouncedKeyword.toLowerCase();
-        let list = allSubs.filter((s) => s.label.toLowerCase().includes(kw));
-        const currentSub = allSubs.find((s) => s.href === pathname);
-        if (currentSub && !list.some((s) => s.href === currentSub.href)) {
-            list = [currentSub, ...list];
+        let list = flattenedNavSubs.filter((s) => s.label.toLowerCase().includes(kw));
+        const currentRow = flattenedNavSubs.find((s) => s.href === searchSubActiveHref);
+        if (
+            currentRow &&
+            !list.some((s) => s.href === currentRow.href && s.label === currentRow.label)
+        ) {
+            list = [currentRow, ...list];
         }
         return list.slice(0, 8);
-    }, [categories, debouncedKeyword, pathname]);
+    }, [flattenedNavSubs, debouncedKeyword, searchSubActiveHref]);
 
     useEffect(() => {
         if (!searchKeyword.trim()) {
@@ -121,6 +123,7 @@ export default function Header() {
         setActiveGender(gender);
         if (!categorySlug) return;
         const subSlug = typeof params.subSlug === "string" ? params.subSlug : "";
+        const subSubSlug = typeof params.subSubSlug === "string" ? params.subSubSlug : "";
         const sexDegree = gender === "men" ? 1 : 2;
         const activeSexDegree = activeGender === "men" ? 1 : 2;
         const mainCat = apiCategories.find(
@@ -132,10 +135,22 @@ export default function Header() {
         );
         if (targetParent) {
             const targetSub = currentSub && targetParent.sub_categories.find((s) => s.name === currentSub.name);
-            const path = targetSub
-                ? `/${gender}/${categorySlug}/${nameToSlug(targetSub.name)}`
-                : `/${gender}/${categorySlug}`;
-            router.push(path);
+            if (targetSub) {
+                const base = `/${gender}/${categorySlug}/${nameToSlug(targetSub.name)}`;
+                if (subSubSlug && currentSub) {
+                    const currentTriple = (currentSub.sub_sub_categories ?? []).find(
+                        (ss) => nameToSlug(ss.name) === subSubSlug
+                    );
+                    const mapped =
+                        currentTriple &&
+                        (targetSub.sub_sub_categories ?? []).find((ss) => ss.name === currentTriple.name);
+                    router.push(mapped ? `${base}/${nameToSlug(mapped.name)}` : base);
+                    return;
+                }
+                router.push(base);
+                return;
+            }
+            router.push(`/${gender}/${categorySlug}`);
         }
     };
 
@@ -221,10 +236,10 @@ export default function Header() {
                                     <p className={`text-[9px] font-black uppercase tracking-[0.5em] italic ${isScrolled ? "text-zinc-700" : "text-zinc-300"}`}>Sub-categories</p>
                                     <div className="flex flex-wrap md:flex-col gap-2 md:gap-4">
                                         {searchPanelSubs.map(sub => {
-                                                const isActive = pathname === sub.href;
+                                                const isActive = searchSubActiveHref === sub.href;
                                                 return (
                                                     <Link
-                                                        key={`${sub.href}-${sub.id}`}
+                                                        key={`${sub.href}-${sub.label}`}
                                                         href={sub.href}
                                                         onClick={() => setIsSearchOpen(false)}
                                                         aria-current={isActive ? "page" : undefined}
