@@ -67,12 +67,13 @@ export default function WomenSection() {
                 className="relative h-[60vh] min-h-[400px] w-full bg-zinc-100 overflow-hidden"
             >
                 <Image
-                    src="/women/women-bg.jpg"
+                    src="/women/clothing.jpg"
                     alt="Women's collection"
                     fill
                     priority
-                    className="object-cover object-center brightness-90"
+                    className="object-cover object-top brightness-90"
                     quality={100}
+                    sizes="100vw"
                 />
                 <div className="absolute inset-0 bg-linear-to-r from-black/60 via-black/20 to-transparent" />
 
