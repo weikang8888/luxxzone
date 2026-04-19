@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, MessageCircle } from "lucide-react";
-import { PLACEHOLDER_IMAGE, WHATSAPP_NUMBER } from "@/lib/constants";
+import { PLACEHOLDER_IMAGE, productCanonicalUrl, whatsappPurchaseInquiryHref } from "@/lib/constants";
 import { categoryMatchesGender } from "@/lib/categoryGender";
 import { useCategories } from "@/app/hooks/useCategories";
 import { useProductListInfinite } from "@/app/hooks/useProductListInfinite";
@@ -351,7 +351,7 @@ export default function CategoryContent({ gender, slug, subSlug }: Props) {
 
                                     <div className="mt-auto">
                                         <a
-                                            href={`https://wa.me/${WHATSAPP_NUMBER}?text=Hi, I am interested in ${p.name}`}
+                                            href={whatsappPurchaseInquiryHref(p.name, productCanonicalUrl(p.id))}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="flex w-full items-center justify-center gap-3 bg-[#25D366] py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white transition-all hover:bg-[#20ba5a] active:scale-95 shadow-sm md:text-[12px]"

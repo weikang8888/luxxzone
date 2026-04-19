@@ -8,30 +8,30 @@ import { ArrowRight } from "lucide-react";
 const categories = [
     {
         id: 1,
-        name: "New Arrival",
-        slug: "new-arrival",
-        image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=800&auto=format&fit=crop",
+        name: "Bags",
+        slug: "bags",
+        image: "/women/lv-bag.jpg",
         gridClass: "md:col-span-2 md:row-span-2",
     },
     {
         id: 2,
-        name: "Clothing",
-        slug: "clothing",
-        image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=800&auto=format&fit=crop",
+        name: "Sneakers",
+        slug: "sneakers",
+        image: "/women/sneaker.jpg",
         gridClass: "md:col-span-1 md:row-span-2",
     },
     {
         id: 3,
-        name: "Shoes",
-        slug: "shoes",
-        image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=800&auto=format&fit=crop",
+        name: "Sandals",
+        slug: "sandals",
+        image: "/women/sandal.jpg",
         gridClass: "md:col-span-1 md:row-span-1",
     },
     {
         id: 4,
-        name: "Bags",
-        slug: "bags",
-        image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?q=80&w=800&auto=format&fit=crop",
+        name: "Heels",
+        slug: "heels",
+        image: "/women/heels.jpg",
         gridClass: "md:col-span-1 md:row-span-1",
     },
 ];
@@ -67,11 +67,12 @@ export default function WomenSection() {
                 className="relative h-[60vh] min-h-[400px] w-full bg-zinc-100 overflow-hidden"
             >
                 <Image
-                    src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1920&auto=format&fit=crop"
+                    src="/women/women-bg.jpg"
                     alt="Women's collection"
                     fill
                     priority
                     className="object-cover object-center brightness-90"
+                    quality={100}
                 />
                 <div className="absolute inset-0 bg-linear-to-r from-black/60 via-black/20 to-transparent" />
 

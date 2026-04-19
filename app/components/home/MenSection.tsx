@@ -6,10 +6,10 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 
 const categories = [
-    { id: 1, name: "New Arrival", slug: "new-arrival", image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=800" },
-    { id: 2, name: "Clothing", slug: "clothing", image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=800" },
-    { id: 3, name: "Shoes", slug: "shoes", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800" },
-    { id: 4, name: "Bags", slug: "bags", image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?q=80&w=800" },
+    { id: 1, name: "Bags", slug: "bags", image: "/men/bag.jpg" },
+    { id: 2, name: "Sandals", slug: "sandals", image: "/men/sandal.jpg" },
+    { id: 3, name: "Sneakers", slug: "sneakers", image: "/men/sneaker.jpg" },
+    { id: 4, name: "Watches", slug: "watches", image: "/men/watches.jpg" },
 ];
 
 const fadeInUp = {
@@ -51,7 +51,7 @@ export default function MenSection() {
                         className="relative md:col-span-2 min-h-[500px] md:min-h-[800px] bg-zinc-100 overflow-hidden"
                     >
                         <Image
-                            src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?q=80&w=1200"
+                            src="/men/clothing.jpg"
                             alt="Men's collection"
                             fill
                             className="object-cover object-center"
