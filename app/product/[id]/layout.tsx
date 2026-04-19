@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getProductDetail } from "@/app/api/api";
-import { PLACEHOLDER_IMAGE, SITE_ORIGIN, productCanonicalUrl } from "@/lib/constants";
+import { SITE_ORIGIN, defaultBrandOgImageUrl, productCanonicalUrl } from "@/lib/constants";
 
 function toAbsoluteImageUrl(url: string): string {
     if (url.startsWith("http://") || url.startsWith("https://")) return url;
@@ -21,7 +21,7 @@ export async function generateMetadata({
 
     let title = "Product";
     let description = "Curated fashion collection for the modern individual.";
-    let imageUrl = toAbsoluteImageUrl(PLACEHOLDER_IMAGE);
+    let imageUrl = defaultBrandOgImageUrl();
 
     try {
         const res = await getProductDetail(id);

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Archivo } from "next/font/google";
+import { DEFAULT_BRAND_OG_PATH, SITE_ORIGIN } from "@/lib/constants";
 import { Suspense } from "react";
 import "./globals.css";
 import SmoothScroll from "./components/SmoothScroll";
@@ -22,8 +23,16 @@ const archivo = Archivo({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_ORIGIN),
   title: "LUXXZONE | Modern Silhouette & Silent Luxury",
   description: "Curated fashion collection for the modern individual. Experience redefined elegance and architectural precision.",
+  openGraph: {
+    images: [{ url: DEFAULT_BRAND_OG_PATH, alt: "LUXXZONE" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: [DEFAULT_BRAND_OG_PATH],
+  },
 };
 
 export default function RootLayout({

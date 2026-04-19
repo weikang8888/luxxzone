@@ -19,6 +19,13 @@ export const TELEGRAM_URL = "https://t.me/LuxxZoneee";
 
 export const PLACEHOLDER_IMAGE = "/fallback.jpg";
 
+/** Default link preview image when there is no product photo. */
+export const DEFAULT_BRAND_OG_PATH = "/logo-horizontal-bg-white.png";
+
+export function defaultBrandOgImageUrl(): string {
+    return `${SITE_ORIGIN}${DEFAULT_BRAND_OG_PATH}`;
+}
+
 // 品牌列表 - 与 category 页 filter 及 Header mobile dropdown 共用
 export const clothingBrandOptions = [
     "Shop All",
