@@ -10,7 +10,7 @@ const categories = [
         id: 1,
         name: "Bags",
         slug: "bags",
-        image: "/women/lv-bag.jpg",
+        image: "/women/bag.jpg",
         gridClass: "md:col-span-2 md:row-span-2",
     },
     {
