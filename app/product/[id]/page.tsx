@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { MessageCircle, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { WHATSAPP_NUMBER } from "@/lib/constants";
+import { WHATSAPP_NUMBER, productCanonicalUrl, whatsappPurchaseInquiryHref } from "@/lib/constants";
 import { useProductDetail } from "@/app/hooks/useProductDetail";
 
 export default function ProductDetailPage() {
@@ -198,7 +198,10 @@ export default function ProductDetailPage() {
                         </div>
 
                         <div className="space-y-3">
-                            <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=Hi, I am interested in ${product.name}`} target="_blank"
+                            <a
+                                href={whatsappPurchaseInquiryHref(product.name, productCanonicalUrl(product.id))}
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 className="flex h-16 w-full items-center justify-center gap-3 bg-[#25D366] text-[11px] font-black uppercase tracking-[0.2em] text-white hover:bg-[#20ba5a] transition-all"
                             >
                                 <MessageCircle className="size-5" /> Inquire on WhatsApp
