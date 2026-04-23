@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
+    // Browser loads remote URLs directly; avoids production /_next/image fetch issues to S3.
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
