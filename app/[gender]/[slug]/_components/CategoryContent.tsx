@@ -15,7 +15,7 @@ import { useProductListInfinite } from "@/app/hooks/useProductListInfinite";
 const sortOptions: { label: string; value: string; sort_title?: number; sort_best_selling?: number; sort_new?: number }[] = [
     { label: "Default", value: "default" },
     { label: "Newest", value: "newest", sort_new: 1 },
-    { label: "Best Selling", value: "best-selling", sort_best_selling: 1 },
+    // { label: "Best Selling", value: "best-selling", sort_best_selling: 1 },
     { label: "Alphabetical A-Z", value: "alphabetical-a-z", sort_title: 1 },
     { label: "Alphabetical Z-A", value: "alphabetical-z-a", sort_title: 2 },
 ];
