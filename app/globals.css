@@ -26,3 +26,27 @@ body {
   @apply antialiased;
   letter-spacing: -0.02em;
 }
+
+/* 全站滚动条：细、黑色 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-brand-black) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 2px;
+  height: 2px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--color-brand-black);
+  border-radius: 9999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #27272a;
+}

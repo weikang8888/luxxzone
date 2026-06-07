@@ -177,11 +177,15 @@ export default function CategoryContent({ gender, slug, subSlug, subSubSlug }: P
 
     return (
         <main className="min-h-screen bg-white pb-20 pt-24 md:pt-32 lg:pt-40">
-            <div className="mx-auto flex max-w-[1920px] flex-col gap-10 px-6 md:flex-row md:px-16">
+            <div className="mx-auto flex max-w-[1920px] items-stretch flex-col gap-10 px-6 md:flex-row md:px-16">
 
                 {/* --- 1. Sidebar --- */}
                 <aside className="hidden w-64 shrink-0 md:block">
                     <div className="sticky top-40">
+                        <div
+                            data-lenis-prevent
+                            className="max-h-[calc(100vh-10rem)] overflow-y-auto overscroll-contain [scrollbar-gutter:stable] overflow-x-hidden"
+                        >
                         <motion.div
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -399,6 +403,7 @@ export default function CategoryContent({ gender, slug, subSlug, subSubSlug }: P
                                 })}
                             </nav>
                         </motion.div>
+                        </div>
                     </div>
                 </aside>
 
