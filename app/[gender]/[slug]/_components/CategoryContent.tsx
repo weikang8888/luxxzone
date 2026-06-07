@@ -92,6 +92,19 @@ export default function CategoryContent({ gender, slug, subSlug, subSubSlug }: P
 
     const products = useMemo(() => data?.pages.flatMap((p) => p.products) ?? [], [data]);
 
+    const queryIdentity = useMemo(
+        () =>
+            [currentCategory?.id, sub_category_id ?? null, subSubCategory?.id ?? null, currentSort].join("-"),
+        [currentCategory?.id, sub_category_id, subSubCategory?.id, currentSort]
+    );
+
+    /** Skip stagger when React Query already has pages (e.g. browser back from product detail). */
+    const skipEntranceRef = useRef<{ key: string; skip: boolean } | null>(null);
+    if (!skipEntranceRef.current || skipEntranceRef.current.key !== queryIdentity) {
+        skipEntranceRef.current = { key: queryIdentity, skip: products.length > 0 };
+    }
+    const skipEntranceAnimation = skipEntranceRef.current.skip;
+
     const totalItemCount =
         (data?.pages[0]?.pagination as { total?: number } | null | undefined)?.total ?? 0;
 
@@ -187,9 +200,13 @@ export default function CategoryContent({ gender, slug, subSlug, subSubSlug }: P
                             className="max-h-[calc(100vh-10rem)] overflow-y-auto overscroll-contain [scrollbar-gutter:stable] overflow-x-hidden"
                         >
                         <motion.div
-                            initial={{ opacity: 0, x: -20 }}
+                            initial={skipEntranceAnimation ? false : { opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.8, ease: "easeOut", staggerChildren: 0.05 }}
+                            transition={
+                                skipEntranceAnimation
+                                    ? { duration: 0 }
+                                    : { duration: 0.8, ease: "easeOut", staggerChildren: 0.05 }
+                            }
                             className="mb-12"
                         >
                             <h2 className="mb-8 text-[10px] font-black uppercase tracking-[0.35em] text-zinc-300 md:text-[12px]">Navigation</h2>
@@ -456,13 +473,15 @@ export default function CategoryContent({ gender, slug, subSlug, subSubSlug }: P
                         </div>
                     ) : (
                         <motion.div
-                            initial="hidden"
+                            initial={skipEntranceAnimation ? false : "hidden"}
                             animate="visible"
                             variants={{
                                 hidden: { opacity: 0 },
                                 visible: {
                                     opacity: 1,
-                                    transition: { staggerChildren: 0.08, delayChildren: 0.05 },
+                                    transition: skipEntranceAnimation
+                                        ? { duration: 0 }
+                                        : { staggerChildren: 0.08, delayChildren: 0.05 },
                                 },
                             }}
                             className="grid grid-cols-2 gap-x-6 gap-y-16 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-10"
@@ -470,8 +489,13 @@ export default function CategoryContent({ gender, slug, subSlug, subSubSlug }: P
                             {(products as ProductItem[]).map((p) => (
                                 <motion.div
                                     key={p.id}
+                                    initial={skipEntranceAnimation ? false : undefined}
                                     variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } }}
-                                    transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+                                    transition={
+                                        skipEntranceAnimation
+                                            ? { duration: 0 }
+                                            : { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }
+                                    }
                                     className="group flex flex-col"
                                 >
                                     <div className="relative aspect-3/4 mb-6 overflow-hidden bg-zinc-50 transition-transform duration-500 hover:shadow-xl">

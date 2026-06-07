@@ -8,14 +8,24 @@ import { MessageCircle, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { WHATSAPP_NUMBER, productCanonicalUrl, whatsappPurchaseInquiryHref } from "@/lib/constants";
 import { useProductDetail } from "@/app/hooks/useProductDetail";
+import { useLenis } from "@/app/context/LenisContext";
 
 export default function ProductDetailPage() {
     const params = useParams();
     const id = typeof params.id === "string" ? parseInt(params.id, 10) : undefined;
+    const lenis = useLenis();
     const { data: product, isLoading, isError } = useProductDetail(id);
 
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
     const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null);
+
+    useEffect(() => {
+        if (lenis) {
+            lenis.scrollTo(0, { immediate: true });
+        } else {
+            window.scrollTo(0, 0);
+        }
+    }, [id, lenis]);
 
     useEffect(() => {
         if (activeImageIndex !== null) document.body.style.overflow = "hidden";
