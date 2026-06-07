@@ -19,8 +19,6 @@ export default function ProductDetailPage() {
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
     const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null);
 
-    console.log(123);
-
     useEffect(() => {
         if (lenis) {
             lenis.scrollTo(0, { immediate: true });
