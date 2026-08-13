@@ -7,8 +7,8 @@ import { ArrowRight } from "lucide-react";
 
 const categories = [
     { id: 1, name: "Bags", slug: "bags", image: "/men/bag.jpg" },
-    { id: 2, name: "Sandals", slug: "sandals", image: "/men/sandal.jpg" },
-    { id: 3, name: "Sneakers", slug: "sneakers", image: "/men/sneaker.jpg" },
+    { id: 2, name: "Sandals", slug: "footwear/sandals", image: "/men/sandal.jpg" },
+    { id: 3, name: "Sneakers", slug: "footwear/sneakers", image: "/men/sneaker.jpg" },
     { id: 4, name: "Watches", slug: "watches", image: "/men/watches.jpg" },
 ];
 
@@ -66,7 +66,7 @@ export default function MenSection() {
                             </p>
                             <div className="mt-8">
                                 <Link
-                                    href="/men/clothing"
+                                    href="/men/clothings"
                                     className="group flex w-fit items-center gap-3 border-b border-white pb-1 transition-all hover:translate-x-2"
                                 >
                                     <span className="text-[11px] font-black uppercase tracking-[0.3em]">SHOP COLLECTION</span>

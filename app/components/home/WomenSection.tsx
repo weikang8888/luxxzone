@@ -16,21 +16,21 @@ const categories = [
     {
         id: 2,
         name: "Sneakers",
-        slug: "sneakers",
+        slug: "footwear/sneakers",
         image: "/women/sneaker.jpg",
         gridClass: "md:col-span-1 md:row-span-2",
     },
     {
         id: 3,
         name: "Sandals",
-        slug: "sandals",
+        slug: "footwear/sandals",
         image: "/women/sandal.jpg",
         gridClass: "md:col-span-1 md:row-span-1",
     },
     {
         id: 4,
         name: "Heels",
-        slug: "heels",
+        slug: "footwear/heels",
         image: "/women/heels.jpg",
         gridClass: "md:col-span-1 md:row-span-1",
     },
@@ -89,7 +89,7 @@ export default function WomenSection() {
                             Fluid lines. Effortless elegance. Curated for the modern woman who values timeless silhouette.
                         </p>
                         <Link
-                            href="/women/clothing"
+                            href="/women/clothings"
                             className="group relative mt-10 flex h-16 w-fit overflow-hidden rounded-none border border-white bg-transparent px-10 py-7 text-[11px] font-black uppercase tracking-[0.3em] text-white transition-all duration-700 hover:border-black hover:text-white"
                         >
                             <span className="relative z-10 flex items-center justify-center gap-3">
