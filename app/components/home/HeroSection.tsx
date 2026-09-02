@@ -30,7 +30,7 @@ export default function HeroSection() {
     return (
         <section className="relative flex min-h-screen w-full flex-col overflow-hidden bg-[#FDFDFD] md:flex-row">
             {/* --- 文字区 --- */}
-            <div className="order-2 z-10 flex w-full flex-col justify-center px-8 py-10 md:order-1 md:w-[45%] md:px-16 md:py-20 lg:px-24">
+            <div className="order-2 z-10 flex w-full flex-col justify-center px-8 pt-4 pb-10 md:order-1 md:w-[45%] md:px-16 md:py-20 lg:px-24">
                 <motion.div
                     initial="hidden"
                     animate="visible"
@@ -90,8 +90,7 @@ export default function HeroSection() {
                         duration: 2,
                         ease: [0.16, 1, 0.3, 1],
                     }}
-                    className="relative w-full shadow-[0_20px_40px_rgba(0,0,0,0.08)] transition-transform duration-500 hover:scale-[1.02]"
-                    style={{ aspectRatio: "3 / 4" }}
+                    className="relative aspect-1914/822 w-full shadow-[0_20px_40px_rgba(0,0,0,0.08)] transition-transform duration-500 hover:scale-[1.02] md:aspect-3/4"
                 >
                     <motion.div
                         initial={{ scale: 1.1 }}
@@ -104,12 +103,20 @@ export default function HeroSection() {
                         className="relative h-full w-full"
                     >
                         <Image
-                            src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=1000&auto=format&fit=crop"
+                            src="/hero-image-mobile.png"
                             alt="Luxxzone SS26"
                             fill
                             priority
-                            className="object-cover"
-                            sizes="(max-width: 768px) 100vw, 55vw"
+                            className="object-cover md:hidden"
+                            sizes="100vw"
+                        />
+                        <Image
+                            src="/hero-image.png"
+                            alt="Luxxzone SS26"
+                            fill
+                            priority
+                            className="hidden object-cover md:block"
+                            sizes="55vw"
                         />
                     </motion.div>
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-zinc-950/5 to-transparent" />
