@@ -30,7 +30,7 @@ export default function HeroSection() {
     return (
         <section className="relative flex min-h-screen w-full flex-col overflow-hidden bg-[#FDFDFD] md:flex-row">
             {/* --- 文字区 --- */}
-            <div className="order-2 z-10 flex w-full flex-col justify-center px-8 pt-4 pb-10 md:order-1 md:w-[45%] md:px-16 md:py-20 lg:px-24">
+            <div className="order-2 z-10 flex w-full flex-col justify-center px-8 py-5 md:order-1 md:w-[45%] md:px-16 md:py-20 lg:px-24">
                 <motion.div
                     initial="hidden"
                     animate="visible"
