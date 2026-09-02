@@ -90,7 +90,7 @@ export default function HeroSection() {
                         duration: 2,
                         ease: [0.16, 1, 0.3, 1],
                     }}
-                    className="relative aspect-1914/822 w-full shadow-[0_20px_40px_rgba(0,0,0,0.08)] transition-transform duration-500 hover:scale-[1.02] md:aspect-3/4"
+                    className="relative aspect-16/9 w-full shadow-[0_20px_40px_rgba(0,0,0,0.08)] transition-transform duration-500 hover:scale-[1.02] md:aspect-3/4"
                 >
                     <motion.div
                         initial={{ scale: 1.1 }}
