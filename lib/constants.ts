@@ -15,7 +15,7 @@ export function whatsappPurchaseInquiryHref(productName: string, productPageUrl:
     return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
 }
 
-export const TELEGRAM_URL = "https://t.me/LuxxZoneee";
+export const TELEGRAM_URL = "https://t.me/+pIWhf0WjECpkMzQ1";
 
 export const PLACEHOLDER_IMAGE = "/fallback.jpg";
 
